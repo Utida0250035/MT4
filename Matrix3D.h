@@ -194,7 +194,7 @@ inline constexpr Matrix4x4 MakeTranslateMatrix(const Vector3& translate) {
 			1.0f, 0.0f, 0.0f, 0.0f,
 			0.0f, 1.0f, 0.0f, 0.0f,
 			0.0f, 0.0f, 1.0f, 0.0f,
-			translate.z, translate.y, translate.z, 1.0f
+			translate.x, translate.y, translate.z, 1.0f
 		}
 	);
 
