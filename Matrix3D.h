@@ -14,12 +14,25 @@
 #endif
 
 struct Matrix4x4 {
-	float m[4][4];
+	float m[4][4]{};
 };
 
 inline constexpr Matrix4x4 operator+(const Matrix4x4& me, const Matrix4x4& other) {
 
 	return Matrix4x4(
+		{
+			me.m[0][0] + other.m[0][0], me.m[0][1] + other.m[0][1], me.m[0][2] + other.m[0][2], me.m[0][3] + other.m[0][3],
+			me.m[1][0] + other.m[1][0], me.m[1][1] + other.m[1][1], me.m[1][2] + other.m[1][2], me.m[1][3] + other.m[1][3],
+			me.m[2][0] + other.m[2][0], me.m[2][1] + other.m[2][1], me.m[2][2] + other.m[2][2], me.m[2][3] + other.m[2][3],
+			me.m[3][0] + other.m[3][0], me.m[3][1] + other.m[3][1], me.m[3][2] + other.m[3][2], me.m[3][3] + other.m[3][3]
+		}
+	);
+
+}
+
+inline constexpr void operator+=(Matrix4x4& me, const Matrix4x4& other) {
+
+	me = Matrix4x4(
 		{
 			me.m[0][0] + other.m[0][0], me.m[0][1] + other.m[0][1], me.m[0][2] + other.m[0][2], me.m[0][3] + other.m[0][3],
 			me.m[1][0] + other.m[1][0], me.m[1][1] + other.m[1][1], me.m[1][2] + other.m[1][2], me.m[1][3] + other.m[1][3],
@@ -43,9 +56,22 @@ inline constexpr Matrix4x4 operator-(const Matrix4x4& me, const Matrix4x4& other
 
 }
 
+inline constexpr void operator-=(Matrix4x4& me, const Matrix4x4& other) {
+
+	me = Matrix4x4(
+		{
+			me.m[0][0] - other.m[0][0], me.m[0][1] - other.m[0][1], me.m[0][2] - other.m[0][2], me.m[0][3] - other.m[0][3],
+			me.m[1][0] - other.m[1][0], me.m[1][1] - other.m[1][1], me.m[1][2] - other.m[1][2], me.m[1][3] - other.m[1][3],
+			me.m[2][0] - other.m[2][0], me.m[2][1] - other.m[2][1], me.m[2][2] - other.m[2][2], me.m[2][3] - other.m[2][3],
+			me.m[3][0] - other.m[3][0], me.m[3][1] - other.m[3][1], me.m[3][2] - other.m[3][2], me.m[3][3] - other.m[3][3]
+		}
+	);
+
+}
+
 inline constexpr Matrix4x4 operator*(const Matrix4x4& me, const Matrix4x4& other) {
 
-	Matrix4x4 result = { 0.0f };
+	Matrix4x4 result = {};
 
 	for (size_t i = 0; i < 4; i++) {
 
@@ -62,6 +88,28 @@ inline constexpr Matrix4x4 operator*(const Matrix4x4& me, const Matrix4x4& other
 	}
 
 	return result;
+
+}
+
+inline constexpr void operator*=(Matrix4x4& me, const Matrix4x4& other) {
+
+	Matrix4x4 result = {};
+
+	for (size_t i = 0; i < 4; i++) {
+
+		for (size_t j = 0; j < 4; j++) {
+
+			for (size_t k = 0; k < 4; k++) {
+
+				result.m[i][j] += me.m[i][k] * other.m[k][j];
+
+			}
+
+		}
+
+	}
+
+	me = result;
 
 }
 

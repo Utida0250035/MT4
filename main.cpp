@@ -15,45 +15,15 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 	char keys[256] = { 0 };
 	char preKeys[256] = { 0 };
 
-	//Vector3 v1{ 1.0f, 3.0f, -5.0f };
-	//Vector3 v2{ 4.0f, -1.0f, 2.0f };
-	//float k = 4.0f;
+	Vector3 rotate{0.4f, -1.43f, -0.8f};
 
-	//Vector3 resultVecAdd = v1 + v2;
+	Matrix4x4 xRotateMatrix = MakeXRotateMatrix(rotate.x);
 
-	//Vector3 resultVecSubtract = v1 - v2;
+	Matrix4x4 yRotateMatrix = MakeYRotateMatrix(rotate.y);
 
-	//Vector3 resultVecMultiply = k * v1;
+	Matrix4x4 zRotateMatrix = MakeZRotateMatrix(rotate.z);
 
-	//float resultDot = VectorDot(v1, v2);
-
-	//float resultLength = VectorLength(v1);
-
-	//Vector3 resultNormalize = VectorNormalize(v2);
-
-	Matrix4x4 m1 = {
-		3.2f, 0.7f, 9.6f, 4.4f,
-		5.5f, 1.3f, 7.8f, 2.1f,
-		6.9f, 8.0f, 2.6f, 1.0f,
-		0.5f, 7.2f, 5.1f, 3.3f
-	};
-
-	Matrix4x4 m2 = {
-		4.1f, 6.5f, 3.3f, 2.2f,
-		8.8f, 0.6f, 9.9f, 7.7f,
-		1.1f, 5.5f, 6.6f, 0.0f,
-		3.3f, 9.9f, 8.8f, 2.2f
-	};
-
-	Matrix4x4 resultMatAdd = m1 + m2;
-	Matrix4x4 resultMatMultiply = m1 * m2;
-	Matrix4x4 resultMatSubtract = m1 - m2;
-
-	Matrix4x4 inverseM1 = MatrixInverse(m1);
-	Matrix4x4 inverseM2 = MatrixInverse(m2);
-	Matrix4x4 transposeM1 = MatrixTranspose(m1);
-	Matrix4x4 transposeM2 = MatrixTranspose(m2);
-	Matrix4x4 identityMat = MakeIdentityMatrix4x4();
+	Matrix4x4 xYZRotateMatrix = xRotateMatrix * yRotateMatrix * zRotateMatrix;
 
 	// ウィンドウの×ボタンが押されるまでループ
 	while (Novice::ProcessMessage() == 0) {
@@ -77,28 +47,13 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 		/// ↓描画処理ここから
 		///
 
-		MatrixScreenPrintf(0, 0, resultMatAdd, "Add");
+		MatrixScreenPrintf(0, 0, xRotateMatrix, "xRotateMatrix");
 
-		MatrixScreenPrintf(0, kMatrixPrintRowHeight * 5, resultMatSubtract, "Subtract");
+		MatrixScreenPrintf(0, kMatrixPrintRowHeight * 5, yRotateMatrix, "yRotateMatrix");
 
-		MatrixScreenPrintf(0, kMatrixPrintRowHeight * 5 * 2, resultMatMultiply, "Multiply");
+		MatrixScreenPrintf(0, kMatrixPrintRowHeight * 5 * 2, zRotateMatrix, "zRotateMatrix");
 
-		MatrixScreenPrintf(0, kMatrixPrintRowHeight * 5 * 3, inverseM1, "inverseM1");
-
-		MatrixScreenPrintf(0, kMatrixPrintRowHeight * 5 * 4, inverseM2, "inverseM2");
-
-		MatrixScreenPrintf(kMatrixPrintColumnWidth * 5, 0, transposeM1, "transposeM1");
-
-		MatrixScreenPrintf(kMatrixPrintColumnWidth * 5, kMatrixPrintRowHeight * 5, transposeM2, "transposeM2");
-
-		MatrixScreenPrintf(kMatrixPrintColumnWidth * 5, kMatrixPrintRowHeight * 5 * 2, identityMat, "identity");
-
-		/*VectorScreenPrintf(640, 0, resultVecAdd, " : Add");
-		VectorScreenPrintf(640, kVectorPrintRowHeight, resultVecSubtract, " : Subtract");
-		VectorScreenPrintf(640, kVectorPrintRowHeight * 2, resultVecMultiply, " : Multiply");
-		Novice::ScreenPrintf(640, kVectorPrintRowHeight * 3, "%.02f : Dot", resultDot);
-		Novice::ScreenPrintf(640, kVectorPrintRowHeight * 4, "%.02f : Length", resultLength);
-		VectorScreenPrintf(640, kVectorPrintRowHeight * 5, resultNormalize, " : Normalize");*/
+		MatrixScreenPrintf(0, kMatrixPrintRowHeight * 5 * 3, xYZRotateMatrix, "xYZRotateMatrix");
 
 		///
 		/// ↑描画処理ここまで
