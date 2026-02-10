@@ -15,21 +15,21 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 	char keys[256] = { 0 };
 	char preKeys[256] = { 0 };
 
-	Vector3 v1{ 1.0f, 3.0f, -5.0f };
-	Vector3 v2{ 4.0f, -1.0f, 2.0f };
-	float k = 4.0f;
+	//Vector3 v1{ 1.0f, 3.0f, -5.0f };
+	//Vector3 v2{ 4.0f, -1.0f, 2.0f };
+	//float k = 4.0f;
 
-	Vector3 resultVecAdd = v1 + v2;
+	//Vector3 resultVecAdd = v1 + v2;
 
-	Vector3 resultVecSubtract = v1 - v2;
+	//Vector3 resultVecSubtract = v1 - v2;
 
-	Vector3 resultVecMultiply = k * v1;
+	//Vector3 resultVecMultiply = k * v1;
 
-	float resultDot = VectorDot(v1, v2);
+	//float resultDot = VectorDot(v1, v2);
 
-	float resultLength = VectorLength(v1);
+	//float resultLength = VectorLength(v1);
 
-	Vector3 resultNormalize = VectorNormalize(v2);
+	//Vector3 resultNormalize = VectorNormalize(v2);
 
 	Matrix4x4 m1 = {
 		3.2f, 0.7f, 9.6f, 4.4f,
