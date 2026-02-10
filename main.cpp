@@ -77,7 +77,7 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 		/// ↓描画処理ここから
 		///
 
-		MatrixScreenPrintf(0, 0, resultMatAdd, "Add");
+		/*MatrixScreenPrintf(0, 0, resultMatAdd, "Add");
 
 		MatrixScreenPrintf(0, kMatrixPrintRowHeight * 5, resultMatSubtract, "Subtract");
 
@@ -91,7 +91,7 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 
 		MatrixScreenPrintf(kMatrixPrintColumnWidth * 5, kMatrixPrintRowHeight * 5, transposeM2, "transposeM2");
 
-		MatrixScreenPrintf(kMatrixPrintColumnWidth * 5, kMatrixPrintRowHeight * 5 * 2, identityMat, "identity");
+		MatrixScreenPrintf(kMatrixPrintColumnWidth * 5, kMatrixPrintRowHeight * 5 * 2, identityMat, "identity");*/
 
 		VectorScreenPrintf(640, 0, resultVecAdd, " : Add");
 		VectorScreenPrintf(640, kVectorPrintRowHeight, resultVecSubtract, " : Subtract");

@@ -5,44 +5,57 @@
 
 Matrix4x4 MatrixInverse(const Matrix4x4& matrix) {
 
-	Matrix4x4 result = {};
+	Matrix4x4 res;
 
-	result.m[0][0] = Determinant3x3(matrix.m[1][1], matrix.m[1][2], matrix.m[1][3], matrix.m[2][1], matrix.m[2][2], matrix.m[2][3], matrix.m[3][1], matrix.m[3][2], matrix.m[3][3]);
-	result.m[0][1] = -Determinant3x3(matrix.m[1][0], matrix.m[1][2], matrix.m[1][3], matrix.m[2][0], matrix.m[2][2], matrix.m[2][3], matrix.m[3][0], matrix.m[3][2], matrix.m[3][3]);
-	result.m[0][2] = Determinant3x3(matrix.m[1][0], matrix.m[1][1], matrix.m[1][3], matrix.m[2][0], matrix.m[2][1], matrix.m[2][3], matrix.m[3][0], matrix.m[3][1], matrix.m[3][3]);
-	result.m[0][3] = -Determinant3x3(matrix.m[1][0], matrix.m[1][1], matrix.m[1][2], matrix.m[2][0], matrix.m[2][1], matrix.m[2][2], matrix.m[3][0], matrix.m[3][1], matrix.m[3][2]);
+	// 各要素の余因子を計算しつつ、転置の位置に代入
+	// res.m[列][行] = 余因子 (符号に注意)
 
-	float determinant = matrix.m[0][0] * result.m[0][0] + matrix.m[0][1] * result.m[0][1] + matrix.m[0][2] * result.m[0][2] + matrix.m[0][3] * result.m[0][3];
+	// --- 1行目の余因子 (結果の1列目へ) ---
+	res.m[0][0] = Determinant3x3(matrix.m[1][1], matrix.m[1][2], matrix.m[1][3], matrix.m[2][1], matrix.m[2][2], matrix.m[2][3], matrix.m[3][1], matrix.m[3][2], matrix.m[3][3]);
+	res.m[1][0] = -Determinant3x3(matrix.m[1][0], matrix.m[1][2], matrix.m[1][3], matrix.m[2][0], matrix.m[2][2], matrix.m[2][3], matrix.m[3][0], matrix.m[3][2], matrix.m[3][3]);
+	res.m[2][0] = Determinant3x3(matrix.m[1][0], matrix.m[1][1], matrix.m[1][3], matrix.m[2][0], matrix.m[2][1], matrix.m[2][3], matrix.m[3][0], matrix.m[3][1], matrix.m[3][3]);
+	res.m[3][0] = -Determinant3x3(matrix.m[1][0], matrix.m[1][1], matrix.m[1][2], matrix.m[2][0], matrix.m[2][1], matrix.m[2][2], matrix.m[3][0], matrix.m[3][1], matrix.m[3][2]);
 
-	if (determinant < 0.00001f) {
+	// 行列式の計算 (1行目の展開)
+	float det = matrix.m[0][0] * res.m[0][0] + matrix.m[0][1] * res.m[1][0] + matrix.m[0][2] * res.m[2][0] + matrix.m[0][3] * res.m[3][0];
+
+	if (std::abs(det) < 0.00001f) {
+		 // 逆行列なし
 
 		return Matrix4x4{};
 
 	}
 
-	float invDet = 1.0f / determinant;
+	float invDet = 1.0f / det;
 
-	result.m[0][0] *= invDet;
-	result.m[0][1] *= invDet;
-	result.m[0][2] *= invDet;
-	result.m[0][3] *= invDet;
+	// --- 残りの余因子を計算 (転置位置に代入) ---
 
-	result.m[1][0] = Determinant3x3(matrix.m[0][1], matrix.m[0][2], matrix.m[0][3], matrix.m[2][1], matrix.m[2][2], matrix.m[2][3], matrix.m[3][1], matrix.m[3][2], matrix.m[3][3]) * invDet;
-	result.m[1][1] = Determinant3x3(matrix.m[0][0], matrix.m[0][2], matrix.m[0][3], matrix.m[2][0], matrix.m[2][2], matrix.m[2][3], matrix.m[3][0], matrix.m[3][2], matrix.m[3][3]) * invDet;
-	result.m[1][2] = Determinant3x3(matrix.m[0][0], matrix.m[0][1], matrix.m[0][3], matrix.m[2][0], matrix.m[2][1], matrix.m[2][3], matrix.m[3][0], matrix.m[3][1], matrix.m[3][3]) * invDet;
-	result.m[1][3] = Determinant3x3(matrix.m[0][0], matrix.m[0][1], matrix.m[0][2], matrix.m[2][0], matrix.m[2][1], matrix.m[2][2], matrix.m[3][0], matrix.m[3][1], matrix.m[3][2]) * invDet;
+	// 2行目の余因子 (結果の2列目へ)
+	res.m[0][1] = -Determinant3x3(matrix.m[0][1], matrix.m[0][2], matrix.m[0][3], matrix.m[2][1], matrix.m[2][2], matrix.m[2][3], matrix.m[3][1], matrix.m[3][2], matrix.m[3][3]);
+	res.m[1][1] = Determinant3x3(matrix.m[0][0], matrix.m[0][2], matrix.m[0][3], matrix.m[2][0], matrix.m[2][2], matrix.m[2][3], matrix.m[3][0], matrix.m[3][2], matrix.m[3][3]);
+	res.m[2][1] = -Determinant3x3(matrix.m[0][0], matrix.m[0][1], matrix.m[0][3], matrix.m[2][0], matrix.m[2][1], matrix.m[2][3], matrix.m[3][0], matrix.m[3][1], matrix.m[3][3]);
+	res.m[3][1] = Determinant3x3(matrix.m[0][0], matrix.m[0][1], matrix.m[0][2], matrix.m[2][0], matrix.m[2][1], matrix.m[2][2], matrix.m[3][0], matrix.m[3][1], matrix.m[3][2]);
 
-	result.m[2][0] = Determinant3x3(matrix.m[0][1], matrix.m[0][2], matrix.m[0][3], matrix.m[1][1], matrix.m[1][2], matrix.m[1][3], matrix.m[3][1], matrix.m[3][2], matrix.m[3][3]) * invDet;
-	result.m[2][1] = Determinant3x3(matrix.m[0][0], matrix.m[0][2], matrix.m[0][3], matrix.m[1][0], matrix.m[1][2], matrix.m[1][3], matrix.m[3][0], matrix.m[3][2], matrix.m[3][3]) * invDet;
-	result.m[2][2] = Determinant3x3(matrix.m[0][0], matrix.m[0][1], matrix.m[0][3], matrix.m[1][0], matrix.m[1][1], matrix.m[1][3], matrix.m[3][0], matrix.m[3][1], matrix.m[3][3]) * invDet;
-	result.m[2][3] = Determinant3x3(matrix.m[0][0], matrix.m[0][1], matrix.m[0][2], matrix.m[1][0], matrix.m[1][1], matrix.m[1][2], matrix.m[3][0], matrix.m[3][1], matrix.m[3][2]) * invDet;
+	// 3行目の余因子 (結果の3列目へ)
+	res.m[0][2] = Determinant3x3(matrix.m[0][1], matrix.m[0][2], matrix.m[0][3], matrix.m[1][1], matrix.m[1][2], matrix.m[1][3], matrix.m[3][1], matrix.m[3][2], matrix.m[3][3]);
+	res.m[1][2] = -Determinant3x3(matrix.m[0][0], matrix.m[0][2], matrix.m[0][3], matrix.m[1][0], matrix.m[1][2], matrix.m[1][3], matrix.m[3][0], matrix.m[3][2], matrix.m[3][3]);
+	res.m[2][2] = Determinant3x3(matrix.m[0][0], matrix.m[0][1], matrix.m[0][3], matrix.m[1][0], matrix.m[1][1], matrix.m[1][3], matrix.m[3][0], matrix.m[3][1], matrix.m[3][3]);
+	res.m[3][2] = -Determinant3x3(matrix.m[0][0], matrix.m[0][1], matrix.m[0][2], matrix.m[1][0], matrix.m[1][1], matrix.m[1][2], matrix.m[3][0], matrix.m[3][1], matrix.m[3][2]);
 
-	result.m[3][0] = Determinant3x3(matrix.m[0][1], matrix.m[0][2], matrix.m[0][3], matrix.m[1][1], matrix.m[1][2], matrix.m[1][3], matrix.m[2][1], matrix.m[2][2], matrix.m[2][3]) * invDet;
-	result.m[3][1] = Determinant3x3(matrix.m[0][0], matrix.m[0][2], matrix.m[0][3], matrix.m[1][0], matrix.m[1][2], matrix.m[1][3], matrix.m[2][0], matrix.m[2][2], matrix.m[2][3]) * invDet;
-	result.m[3][2] = Determinant3x3(matrix.m[0][0], matrix.m[0][1], matrix.m[0][3], matrix.m[1][0], matrix.m[1][1], matrix.m[1][3], matrix.m[2][0], matrix.m[2][1], matrix.m[2][3]) * invDet;
-	result.m[3][3] = Determinant3x3(matrix.m[0][0], matrix.m[0][1], matrix.m[0][2], matrix.m[1][0], matrix.m[1][1], matrix.m[1][2], matrix.m[2][0], matrix.m[2][1], matrix.m[2][2]) * invDet;
+	// 4行目の余因子 (結果の4列目へ)
+	res.m[0][3] = -Determinant3x3(matrix.m[0][1], matrix.m[0][2], matrix.m[0][3], matrix.m[1][1], matrix.m[1][2], matrix.m[1][3], matrix.m[2][1], matrix.m[2][2], matrix.m[2][3]);
+	res.m[1][3] = Determinant3x3(matrix.m[0][0], matrix.m[0][2], matrix.m[0][3], matrix.m[1][0], matrix.m[1][2], matrix.m[1][3], matrix.m[2][0], matrix.m[2][2], matrix.m[2][3]);
+	res.m[2][3] = -Determinant3x3(matrix.m[0][0], matrix.m[0][1], matrix.m[0][3], matrix.m[1][0], matrix.m[1][1], matrix.m[1][3], matrix.m[2][0], matrix.m[2][1], matrix.m[2][3]);
+	res.m[3][3] = Determinant3x3(matrix.m[0][0], matrix.m[0][1], matrix.m[0][2], matrix.m[1][0], matrix.m[1][1], matrix.m[1][2], matrix.m[2][0], matrix.m[2][1], matrix.m[2][2]);
 
-	return result;
+	// 最後に一括で invDet を掛ける
+	for (int i = 0; i < 4; i++) {
+		for (int j = 0; j < 4; j++) {
+			res.m[i][j] *= invDet;
+		}
+	}
+
+	return res;
 
 }
 
