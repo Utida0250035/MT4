@@ -110,54 +110,45 @@ Matrix4x4 MakeZRotateMatrix(const float& angle) {
 #if HAS_VECTOR3
 
 Matrix4x4 MakeWorldMatrix(const Vector3& translation, const Vector3& scale, const Vector3& rotation) {
+	float cx = cosf(rotation.x); float sx = sinf(rotation.x);
+	float cy = cosf(rotation.y); float sy = sinf(rotation.y);
+	float cz = cosf(rotation.z); float sz = sinf(rotation.z);
 
 	return Matrix4x4{
 
 		// 1,1([0][0])
-		scale.x * (cosf(rotation.y) * cosf(rotation.z) + sinf(rotation.y) * sinf(rotation.x) * sinf(rotation.z)),
-
+		scale.x * (cy * cz),
 		// 1,2([0][1])
-		scale.x * (cosf(rotation.x) * sinf(rotation.z)),
-
+		scale.x * (cy * sz),
 		// 1,3([0][2])
-		scale.x * (cosf(rotation.y) * sinf(rotation.x) * sinf(rotation.z) - sinf(rotation.y) * cosf(rotation.z)),
-
+		scale.x * (-sy),
 		// 1,4([0][3])
 		0.0f,
 
 		// 2,1([1][0])
-		scale.y * (sinf(rotation.y) * sinf(rotation.x) * cosf(rotation.z) - cosf(rotation.y) * sinf(rotation.z)),
-
+		scale.y * (sx * sy * cz - cx * sz),
 		// 2,2([1][1])
-		scale.y * (cosf(rotation.x) * cosf(rotation.z)),
-
+		scale.y * (sx * sy * sz + cx * cz),
 		// 2,3([1][2])
-		scale.y * (sinf(rotation.y) * sinf(rotation.z) + cosf(rotation.y) * sinf(rotation.x) * cosf(rotation.z)),
-
+		scale.y * (sx * cy),
 		// 2,4([1][3])
 		0.0f,
 
 		// 3,1([2][0])
-		scale.z * (sinf(rotation.y) * cosf(rotation.x)),
-
+		scale.z * (cx * sy * cz + sx * sz),
 		// 3,2([2][1])
-		scale.z * (-sinf(rotation.x)),
-
+		scale.z * (cx * sy * sz - sx * cz),
 		// 3,3([2][2])
-		scale.z * (cosf(rotation.y) * cosf(rotation.x)),
-
+		scale.z * (cx * cy),
 		// 3,4([2][3])
 		0.0f,
 
 		// 4,1([3][0])
 		translation.x,
-
 		// 4,2([3][1])
 		translation.y,
-
 		// 4,3([3][2])
 		translation.z,
-
 		// 4,4([3][3])
 		1.0f
 
