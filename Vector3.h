@@ -66,6 +66,12 @@ inline constexpr float VectorDot(const Vector3& me, const Vector3& other) {
 
 }
 
+inline constexpr Vector3 VectorCross(const Vector3& me, const Vector3& other) {
+
+	return Vector3{ me.y * other.z - me.z * other.y, me.z * other.x - me.x * other.z, me.x * other.y - me.y * other.x };
+
+}
+
 float VectorLength(const Vector3& vector);
 
 inline constexpr float VectorLengthSquare(const Vector3& vector) {
