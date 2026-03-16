@@ -1,10 +1,11 @@
-﻿#define NOMINMAX
-
+﻿#include "DrawShapes.h"
 #include "Matrix3D.h"
+#include "Sphere.h"
+#include <algorithm>
+#include <cmath>
 #include <Novice.h>
 #include <numbers>
-#include <cmath>
-#include <algorithm>
+#include <ImGui.h>
 
 // 個人: クラス記号_出席番号_氏_名_タイトル
 // チーム: チームNo_タイトル
@@ -23,26 +24,18 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 	char keys[256] = { 0 };
 	char preKeys[256] = { 0 };
 
-	Vector3 cross = VectorCross(Vector3{ 1.2f, -3.9f, 2.5f }, Vector3{ 2.8f, 0.4f, -1.3f });
+	Vector3 cameraPosition{ 0.0f, 1.9f, -6.49f };
 
-	const Vector3 kLocalVertices[3] = {
-		Vector3{0.0f, 32.0f, 0.0f},
-		Vector3{16.0f, -32.0f, 0.0f},
-		Vector3{-16.0f, -32.0f, 0.0f}
-	};
+	Vector3 cameraRotate{ 0.26f, 0.0f, 0.0f };
 
-	float speed = 5.0f;
+	Sphere sphere{};
 
-	Vector3 angularVelocity = Vector3{0.0f, std::numbers::pi_v<float> / 180.0f * 5.0f, 0.0f};
-
-	Vector3 rotate{0.0f, 0.0f, 0.0f};
-	Vector3 translate{0.0f, 0.0f, 0.0f};
-	
-	Vector3 cameraPosition{0.0f, 0.0f, -512.0f};
+	sphere.center = {};
+	sphere.radius = 1.0f;
 
 	// ウィンドウの×ボタンが押されるまでループ
 	while (Novice::ProcessMessage() == 0) {
-		
+
 		// フレームの開始
 		Novice::BeginFrame();
 
@@ -54,39 +47,17 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 		/// ↓更新処理ここから
 		///
 
-		if (keys[DIK_W]) {
+		ImGui::Begin("debug");
 
-			translate.z += speed;
+		ImGui::DragFloat3("cameraTranslate", &cameraPosition.x, 0.0625f);
 
-		}
+		ImGui::DragFloat3("cameraRotate", &cameraRotate.x, 0.0625f);
 
-		if (keys[DIK_S]) {
+		ImGui::DragFloat3("sphereCenter", &sphere.center.x, 0.0625f);
 
-			translate.z -= speed;
+		ImGui::DragFloat("sphereRadius", &sphere.radius, 0.0625f);
 
-		}
-
-		if (keys[DIK_D]) {
-
-			translate.x += speed;
-
-		}
-
-		if (keys[DIK_A]) {
-
-			translate.x -= speed;
-
-		}
-
-		translate.z = std::max(0.0f, translate.z);
-
-		rotate += angularVelocity;
-
-		if (rotate.y >= 2.0f * std::numbers::pi_v<float>) {
-
-			rotate.y = fmodf(rotate.y, 2.0f * std::numbers::pi_v<float>);
-
-		}
+		ImGui::End();
 
 		///
 		/// ↑更新処理ここまで
@@ -96,36 +67,19 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 		/// ↓描画処理ここから
 		///
 
-		Matrix4x4 worldMatrix = MakeWorldMatrix(translate, Vector3{ 1.0f, 1.0f, 1.0f }, rotate);
-
-		Matrix4x4 cameraMatrix = MakeWorldMatrix(cameraPosition, Vector3{ 1.0f, 1.0f, 1.0f }, Vector3{0.0f, 0.0f, 0.0f});
+		Matrix4x4 cameraMatrix = MakeWorldMatrix(cameraPosition, Vector3{ 1.0f, 1.0f, 1.0f }, cameraRotate);
 
 		Matrix4x4 viewMatrix = MatrixInverse(cameraMatrix);
 
 		Matrix4x4 projectionMatrix = MakePerspactiveFovMatrix(0.45f, kWindowWidth / kWindowHeight, 0.1f, 100.0f);
 
-		Matrix4x4 worldViewProjectionMatrix = worldMatrix * viewMatrix * projectionMatrix;
+		Matrix4x4 viewProjectionMatrix = viewMatrix * projectionMatrix;
 
 		Matrix4x4 viewportMatrix = MakeViewportMatrix(0.0f, 0.0f, kWindowWidth, kWindowHeight, 0.0f, 1.0f);
 
-		Vector3 screenVertices[3];
-		for (size_t i = 0; i < 3; ++i) {
+		DrawGrid(viewProjectionMatrix, viewportMatrix);
 
-			Vector3 ndcVertex = VectorTransform(kLocalVertices[i], worldViewProjectionMatrix);
-
-			screenVertices[i] = VectorTransform(ndcVertex, viewportMatrix);
-
-		}
-
-		Novice::DrawTriangle(
-			static_cast<int>(screenVertices[0].x), static_cast<int>(screenVertices[0].y),
-			static_cast<int>(screenVertices[1].x), static_cast<int>(screenVertices[1].y),
-			static_cast<int>(screenVertices[2].x), static_cast<int>(screenVertices[2].y),
-			RED,
-			kFillModeSolid
-		);
-
-		VectorScreenPrintf(0, 0, cross, "Cross");
+		DrawSphere(sphere, viewProjectionMatrix, viewportMatrix, 0x333333FF);
 
 		///
 		/// ↑描画処理ここまで
@@ -136,9 +90,9 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 
 		// ESCキーが押されたらループを抜ける
 		if (!preKeys[DIK_ESCAPE] && keys[DIK_ESCAPE]) {
-		
+
 			break;
-		
+
 		}
 
 	}
