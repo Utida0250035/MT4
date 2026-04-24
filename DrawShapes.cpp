@@ -19,11 +19,11 @@ void DrawGrid(const Matrix4x4& viewProjectionMatrix, const Matrix4x4& viewportMa
 		Matrix4x4 lineStartWorldMatrix = MakeWorldMatrix(lineStartPosWorld);
 		Matrix4x4 lineEndWorldMatrix = MakeWorldMatrix(lineEndPosWorld);
 
-		Vector3 lineStartPosNdc = VectorTransform(Vector3{}, lineStartWorldMatrix * viewProjectionMatrix);
-		Vector3 lineEndPosNdc = VectorTransform(Vector3{}, lineEndWorldMatrix * viewProjectionMatrix);
+		Vector3 lineStartPosNdc = Transform(Vector3{}, lineStartWorldMatrix * viewProjectionMatrix);
+		Vector3 lineEndPosNdc = Transform(Vector3{}, lineEndWorldMatrix * viewProjectionMatrix);
 
-		Vector3 lineStartPosScreen = VectorTransform(lineStartPosNdc, viewportMatrix);
-		Vector3 lineEndPosScreen = VectorTransform(lineEndPosNdc, viewportMatrix);
+		Vector3 lineStartPosScreen = Transform(lineStartPosNdc, viewportMatrix);
+		Vector3 lineEndPosScreen = Transform(lineEndPosNdc, viewportMatrix);
 
 		NoviceUtility::DrawLine(
 			lineStartPosScreen, lineEndPosScreen, 0xAAAAAAFF
@@ -40,11 +40,11 @@ void DrawGrid(const Matrix4x4& viewProjectionMatrix, const Matrix4x4& viewportMa
 		Matrix4x4 lineStartWorldMatrix = MakeWorldMatrix(lineStartPosWorld);
 		Matrix4x4 lineEndWorldMatrix = MakeWorldMatrix(lineEndPosWorld);
 
-		Vector3 lineStartPosNdc = VectorTransform(Vector3{}, lineStartWorldMatrix * viewProjectionMatrix);
-		Vector3 lineEndPosNdc = VectorTransform(Vector3{}, lineEndWorldMatrix * viewProjectionMatrix);
+		Vector3 lineStartPosNdc = Transform(Vector3{}, lineStartWorldMatrix * viewProjectionMatrix);
+		Vector3 lineEndPosNdc = Transform(Vector3{}, lineEndWorldMatrix * viewProjectionMatrix);
 
-		Vector3 lineStartPosScreen = VectorTransform(lineStartPosNdc, viewportMatrix);
-		Vector3 lineEndPosScreen = VectorTransform(lineEndPosNdc, viewportMatrix);
+		Vector3 lineStartPosScreen = Transform(lineStartPosNdc, viewportMatrix);
+		Vector3 lineEndPosScreen = Transform(lineEndPosNdc, viewportMatrix);
 
 		NoviceUtility::DrawLine(
 			lineStartPosScreen, lineEndPosScreen, 0xAAAAAAFF
@@ -59,11 +59,11 @@ void DrawGrid(const Matrix4x4& viewProjectionMatrix, const Matrix4x4& viewportMa
 	Matrix4x4 xLineStartWorldMatrix = MakeWorldMatrix(xLineStartPosWorld);
 	Matrix4x4 xLineEndWorldMatrix = MakeWorldMatrix(xLineEndPosWorld);
 
-	Vector3 xLineStartPosNdc = VectorTransform(Vector3{}, xLineStartWorldMatrix * viewProjectionMatrix);
-	Vector3 xLineEndPosNdc = VectorTransform(Vector3{}, xLineEndWorldMatrix * viewProjectionMatrix);
+	Vector3 xLineStartPosNdc = Transform(Vector3{}, xLineStartWorldMatrix * viewProjectionMatrix);
+	Vector3 xLineEndPosNdc = Transform(Vector3{}, xLineEndWorldMatrix * viewProjectionMatrix);
 
-	Vector3 xLineStartPosScreen = VectorTransform(xLineStartPosNdc, viewportMatrix);
-	Vector3 xLineEndPosScreen = VectorTransform(xLineEndPosNdc, viewportMatrix);
+	Vector3 xLineStartPosScreen = Transform(xLineStartPosNdc, viewportMatrix);
+	Vector3 xLineEndPosScreen = Transform(xLineEndPosNdc, viewportMatrix);
 
 	NoviceUtility::DrawLine(
 		xLineStartPosScreen, xLineEndPosScreen, 0x000000FF
@@ -76,11 +76,11 @@ void DrawGrid(const Matrix4x4& viewProjectionMatrix, const Matrix4x4& viewportMa
 	Matrix4x4 zLineStartWorldMatrix = MakeWorldMatrix(zLineStartPosWorld);
 	Matrix4x4 zLineEndWorldMatrix = MakeWorldMatrix(zLineEndPosWorld);
 
-	Vector3 zLineStartPosNdc = VectorTransform(Vector3{}, zLineStartWorldMatrix * viewProjectionMatrix);
-	Vector3 zLineEndPosNdc = VectorTransform(Vector3{}, zLineEndWorldMatrix * viewProjectionMatrix);
+	Vector3 zLineStartPosNdc = Transform(Vector3{}, zLineStartWorldMatrix * viewProjectionMatrix);
+	Vector3 zLineEndPosNdc = Transform(Vector3{}, zLineEndWorldMatrix * viewProjectionMatrix);
 
-	Vector3 zLineStartPosScreen = VectorTransform(zLineStartPosNdc, viewportMatrix);
-	Vector3 zLineEndPosScreen = VectorTransform(zLineEndPosNdc, viewportMatrix);
+	Vector3 zLineStartPosScreen = Transform(zLineStartPosNdc, viewportMatrix);
+	Vector3 zLineEndPosScreen = Transform(zLineEndPosNdc, viewportMatrix);
 
 	NoviceUtility::DrawLine(
 		zLineStartPosScreen, zLineEndPosScreen, 0x000000FF
@@ -98,7 +98,7 @@ void DrawSphere(const Sphere& sphere, const Matrix4x4& viewProjectionMatrix, con
 
 	for (size_t i = 0; i < kSubdivision; ++i) {
 
-		float lat = std::numbers::pi_v<float> *0.5f + kLatEvery * static_cast<float>(i);
+		float lat = -(std::numbers::pi_v<float> * 0.5f) + kLatEvery * static_cast<float>(i);
 
 		for (size_t j = 0; j < kSubdivision; ++j) {
 
@@ -112,21 +112,21 @@ void DrawSphere(const Sphere& sphere, const Matrix4x4& viewProjectionMatrix, con
 
 			cPosLocal = Vector3{ cos(lat) * cos(lon + kLonEvery), sin(lat), cos(lat) * sin(lon + kLonEvery) } * sphere.radius;
 
-			Vector3 lineABStartPosNdc = VectorTransform(aPosLocal, worldViewProjectionMatrix);
-			Vector3 lineABEndPosNdc = VectorTransform(bPosLocal, worldViewProjectionMatrix);
+			Vector3 lineABStartPosNdc = Transform(aPosLocal, worldViewProjectionMatrix);
+			Vector3 lineABEndPosNdc = Transform(bPosLocal, worldViewProjectionMatrix);
 
-			Vector3 lineABStartPosScreen = VectorTransform(lineABStartPosNdc, viewportMatrix);
-			Vector3 lineABEndPosScreen = VectorTransform(lineABEndPosNdc, viewportMatrix);
+			Vector3 lineABStartPosScreen = Transform(lineABStartPosNdc, viewportMatrix);
+			Vector3 lineABEndPosScreen = Transform(lineABEndPosNdc, viewportMatrix);
 
 			NoviceUtility::DrawLine(
 				lineABStartPosScreen, lineABEndPosScreen, color
 			);
 
-			Vector3 lineACStartPosNdc = VectorTransform(aPosLocal, worldViewProjectionMatrix);
-			Vector3 lineACEndPosNdc = VectorTransform(cPosLocal, worldViewProjectionMatrix);
+			Vector3 lineACStartPosNdc = Transform(aPosLocal, worldViewProjectionMatrix);
+			Vector3 lineACEndPosNdc = Transform(cPosLocal, worldViewProjectionMatrix);
 
-			Vector3 lineACStartPosScreen = VectorTransform(lineACStartPosNdc, viewportMatrix);
-			Vector3 lineACEndPosScreen = VectorTransform(lineACEndPosNdc, viewportMatrix);
+			Vector3 lineACStartPosScreen = Transform(lineACStartPosNdc, viewportMatrix);
+			Vector3 lineACEndPosScreen = Transform(lineACEndPosNdc, viewportMatrix);
 
 			NoviceUtility::DrawLine(
 				lineACStartPosScreen, lineACEndPosScreen, color

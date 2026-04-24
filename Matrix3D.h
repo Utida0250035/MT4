@@ -1,17 +1,7 @@
 ﻿#pragma once
 
-#if __has_include("Vector3.h")
-
 #include "Vector3.h"
 #include <cassert>
-
-#define HAS_VECTOR3 true
-
-#else
-
-#define HAS_VECTOR3 false
-
-#endif
 
 struct Matrix4x4 {
 	float m[4][4]{};
@@ -113,6 +103,24 @@ inline constexpr void operator*=(Matrix4x4& me, const Matrix4x4& other) {
 
 }
 
+inline Matrix4x4 Add(const Matrix4x4& me, const Matrix4x4& other) {
+
+	return me + other;
+
+}
+
+inline Matrix4x4 Subtract(const Matrix4x4& me, const Matrix4x4& other) {
+
+	return me - other;
+
+}
+
+inline Matrix4x4 Multiply(const Matrix4x4& me, const Matrix4x4& other) {
+
+	return me * other;
+
+}
+
 /// <summary>
 /// 3x3の行列式を求める補助関数
 /// </summary>
@@ -138,9 +146,9 @@ inline constexpr float Determinant3x3(
 
 }
 
-Matrix4x4 MatrixInverse(const Matrix4x4& matrix);
+Matrix4x4 Inverse(const Matrix4x4& matrix);
 
-inline constexpr Matrix4x4 MatrixTranspose(const Matrix4x4 matrix) {
+inline constexpr Matrix4x4 Transpose(const Matrix4x4 matrix) {
 
 	Matrix4x4 result = {};
 
@@ -158,7 +166,7 @@ inline constexpr Matrix4x4 MatrixTranspose(const Matrix4x4 matrix) {
 
 }
 
-inline constexpr Matrix4x4 MakeIdentityMatrix4x4() {
+inline constexpr Matrix4x4 MakeIdentity4x4() {
 
 	return Matrix4x4(
 		{
@@ -170,8 +178,6 @@ inline constexpr Matrix4x4 MakeIdentityMatrix4x4() {
 	);
 
 }
-
-#if HAS_VECTOR3
 
 
 inline constexpr Matrix4x4 MakeScaleMatrix(const Vector3& scale) {
@@ -200,7 +206,7 @@ inline constexpr Matrix4x4 MakeTranslateMatrix(const Vector3& translate) {
 
 }
 
-inline constexpr Vector3 VectorTransform(const Vector3& vector, const Matrix4x4& matrix) {
+inline constexpr Vector3 Transform(const Vector3& vector, const Matrix4x4& matrix) {
 
 	Vector3 result{};
 
@@ -209,7 +215,7 @@ inline constexpr Vector3 VectorTransform(const Vector3& vector, const Matrix4x4&
 	result.z = vector.x * matrix.m[0][2] + vector.y * matrix.m[1][2] + vector.z * matrix.m[2][2] + matrix.m[3][2];
 	float w = vector.x * matrix.m[0][3] + vector.y * matrix.m[1][3] + vector.z * matrix.m[2][3] + matrix.m[3][3];
 
-	assert(w != 0.0f && "Error: vector couuld not transform");
+	assert(w != 0.0f && "Error: vector could not transform");
 
 	result /= w;
 
@@ -225,7 +231,7 @@ Matrix4x4 MakeZRotateMatrix(const float& angle);
 
 Matrix4x4 MakeWorldMatrix(const Vector3& translation, const Vector3& scale = Vector3{ 1.0f, 1.0f, 1.0f }, const Vector3& rotation = Vector3{0.0f, 0.0f, 0.0f});
 
-#endif
+Matrix4x4 MakeAffineMatrix(const Vector3& scale, const Vector3& rotate, const Vector3& translate);
 
 #if HAS_KAMATA_ENGINE
 
@@ -263,7 +269,7 @@ void MatrixScreenPrintf(const int& x, const int& y, const Matrix4x4& matrix, con
 #endif
 
 // 透視投影行列
-Matrix4x4 MakePerspactiveFovMatrix(float fovY, float aspectRatio, float nearClip, float farClip);
+Matrix4x4 MakePerspectiveFovMatrix(float fovY, float aspectRatio, float nearClip, float farClip);
 
 // 正射影行列
 Matrix4x4 MakeOrthographicMatrix(float left, float top, float right, float bottom, float nearClip, float farClip);
