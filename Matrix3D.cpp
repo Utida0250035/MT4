@@ -3,7 +3,7 @@
 #include <cmath>
 #include <Novice.h>
 
-Matrix4x4 MatrixInverse(const Matrix4x4& matrix) {
+Matrix4x4 Inverse(const Matrix4x4& matrix) {
 
 	Matrix4x4 res;
 
@@ -107,7 +107,6 @@ Matrix4x4 MakeZRotateMatrix(const float& angle) {
 
 }
 
-#if HAS_VECTOR3
 
 Matrix4x4 MakeWorldMatrix(const Vector3& translation, const Vector3& scale, const Vector3& rotation) {
 	float cx = cosf(rotation.x); float sx = sinf(rotation.x);
@@ -155,9 +154,17 @@ Matrix4x4 MakeWorldMatrix(const Vector3& translation, const Vector3& scale, cons
 	};
 }
 
-#endif
+Matrix4x4 MakeAffineMatrix(const Vector3& scale, const Vector3& rotate, const Vector3& translate) {
 
-#if __has_include(<Novice.h>)
+	Matrix4x4 scaleMatrix = MakeScaleMatrix(scale);
+
+	Matrix4x4 rotateMatrix = Multiply(Multiply(MakeXRotateMatrix(rotate.x), MakeYRotateMatrix(rotate.y)), MakeZRotateMatrix(rotate.z));
+
+	Matrix4x4 translateMatrix = MakeTranslateMatrix(translate);
+
+	return Multiply(Multiply(scaleMatrix, rotateMatrix), translateMatrix);
+
+}
 
 void MatrixScreenPrintf(const int& x, const int& y, const Matrix4x4& matrix, const char* label) {
 
@@ -178,9 +185,7 @@ void MatrixScreenPrintf(const int& x, const int& y, const Matrix4x4& matrix, con
 
 }
 
-#endif
-
-Matrix4x4 MakePerspactiveFovMatrix(float fovY, float aspectRatio, float nearClip, float farClip) {
+Matrix4x4 MakePerspectiveFovMatrix(float fovY, float aspectRatio, float nearClip, float farClip) {
 
 	float cotangent = 1.0f / (tan(fovY * 0.5f));
 
