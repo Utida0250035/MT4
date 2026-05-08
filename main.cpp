@@ -73,7 +73,11 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 		/// ↓描画処理ここから
 		///
 
-
+		Matrix4x4 cameraMatrix = MakeWorldMatrix(cameraPosition, Vector3{ 1.0f, 1.0f, 1.0f }, cameraRotate);
+		Matrix4x4 viewMatrix = Inverse(cameraMatrix);
+		Matrix4x4 projectionMatrix = MakePerspectiveFovMatrix(0.45f, kWindowWidth / kWindowHeight, 0.1f, 100.0f);
+		Matrix4x4 viewProjectionMatrix = viewMatrix * projectionMatrix;
+		Matrix4x4 viewportMatrix = MakeViewportMatrix(0.0f, 0.0f, kWindowWidth, kWindowHeight, 0.0f, 1.0f);
 
 		///
 		/// ↑描画処理ここまで
