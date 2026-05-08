@@ -32,6 +32,9 @@
     <ClCompile Include="NoviceUtility.cpp">
       <Filter>KamataEngine</Filter>
     </ClCompile>
+    <ClCompile Include="Line.cpp">
+      <Filter>KamataEngine</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="C:\KamataEngine\DirectXGame\audio\Audio.h">
@@ -120,5 +123,6 @@
     <ClInclude Include="DrawShapes.h" />
     <ClInclude Include="NoviceUtility.h" />
     <ClInclude Include="Sphere.h" />
+    <ClInclude Include="Line.h" />
   </ItemGroup>
 </Project>
