@@ -92,6 +92,16 @@ inline Vector3 VectorNormalize(const Vector3& vector) {
 	return Vector3{ 0.0f, 0.0f, 0.0f };
 }
 
+inline Vector3 VectorProject(const Vector3& me, const Vector3& other) {
+
+	float t = VectorDot(me, other) / VectorLengthSquare(other);
+
+	return t * other;
+
+}
+
+Vector3 VectorProjectClamped(const Vector3& me, const Vector3& other);
+
 static constexpr int kVectorPrintColumnWidth = 60;
 static constexpr int kVectorPrintRowHeight = 20;
 

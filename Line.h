@@ -15,3 +15,9 @@ struct Segment {
 	Vector3 origin;
 	Vector3 difference;
 };
+
+inline Vector3 ClosestPoint(const Vector3& point, const Segment& segment){
+
+	return segment.origin + VectorProjectClamped((point - segment.origin), segment.difference);
+
+}
