@@ -3,6 +3,8 @@
 
 class Camera {
 
+private:
+
 	float viewportWidth_ = 1280.0f;
 
 	float viewportHeight_ = 720.0f;
@@ -26,9 +28,8 @@ class Camera {
 	// 回転
 	Vector3 rotate_{};
 
-
-	// カメラのワールド行列
-	Matrix4x4 cameraWorldMatrix_{};
+	// ワールド行列
+	Matrix4x4 worldMatrix_{};
 
 	// ビュー行列
 	Matrix4x4 viewMatrix_{};
@@ -42,30 +43,47 @@ class Camera {
 	// ビューポート変換行列
 	Matrix4x4 viewportMatrix_{};
 
+public:
+
 	/// <summary>
 	/// 行列の更新
 	/// </summary>
 	void MatrixUpdate();
 
 	/// <summary>
-	/// セッター 位置
+	/// ゲッター
+	/// </summary>
+	/// <returns>ビュー行列 * 透視投影行列</returns>
+	Matrix4x4 GetViewProjectionMatrix()const { return viewProjectionMatrix_; }
+
+	/// <summary>
+	/// ゲッター
+	/// </summary>
+	/// <returns>ビューポート変換行列</returns>
+	Matrix4x4 GetViewportMatrix()const { return viewportMatrix_; }
+
+	/// <summary>
+	/// ゲッター
+	/// </summary>
+	/// <returns> 位置 </returns>
+	Vector3 GetTranslate()const { return translate_; }
+
+	/// <summary>
+	/// ゲッター
+	/// </summary>
+	/// <returns> 回転 </returns>
+	Vector3 GetRotate()const { return rotate_; }
+
+	/// <summary>
+	/// セッター
 	/// </summary>
 	/// <param name="translate"> 位置 </param>
 	void SetTranslate(const Vector3& translate) { translate_ = translate; }
 
 	/// <summary>
-	/// セッター 回転
+	/// セッター
 	/// </summary>
 	/// <param name="rotate"> 回転 </param>
 	void SetRotate(const Vector3& rotate) { rotate_ = rotate; }
-
-	/// <summary>
-	/// スクリーン座標変換
-	/// </summary>
-	/// <param name="translate"> 位置 </param>
-	/// <param name="scale"> 拡大縮小 </param>
-	/// <param name="rotate"> 回転 </param>
-	/// <returns></returns>
-	Vector3 Transform(const Vector3& translate, const Vector3& scale, const Vector3& rotate);
 
 };
