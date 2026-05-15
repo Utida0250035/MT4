@@ -1,11 +1,15 @@
-﻿#include "DrawShapes.h"
+﻿#include "Camera.h"
+#include "DrawShapes.h"
 #include "Matrix3D.h"
 #include "Sphere.h"
+#include "Line.h"
+#include "NoviceUtility.h"
 #include <algorithm>
 #include <cmath>
 #include <Novice.h>
 #include <numbers>
 #include <ImGui.h>
+#include <memory>
 
 // 個人: クラス記号_出席番号_氏_名_タイトル
 // チーム: チームNo_タイトル
@@ -24,57 +28,19 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 	char keys[256] = { 0 };
 	char preKeys[256] = { 0 };
 
-	Vector3 cameraPosition{ 0.0f, 1.9f, -6.49f };
+	std::unique_ptr<Camera> camera = nullptr;
+	camera.reset(new Camera());
 
-	Vector3 cameraRotate{ 0.26f, 0.0f, 0.0f };
+	camera->SetTranslate(Vector3{ 0.0f, 1.9f, -6.49f });
 
-	Sphere sphere{};
+	camera->SetRotate(Vector3{ 0.26f, 0.0f, 0.0f });
 
-	sphere.center = {};
-	sphere.radius = 1.0f;
+	Vector3 cameraPosition{};
+	Vector3 cameraRotate{};
 
+	Segment segment{ {-2.0f, -1.0f, 0.0f}, {3.0f, 2.0f, 2.0f} };
 
-	Vector3 scale{ 1.2f, 0.79f, -2.1f };
-	Vector3 rotate{ 0.4f, 1.43f, -0.8f };
-	Vector3 translate{2.7f, -4.15f, 1.57f};
-	Matrix4x4 worldMatrix = MakeAffineMatrix(scale, rotate, translate);
-
-
-	translate = Vector3{4.1f, 2.6f, 0.8f};
-	scale = Vector3{ 1.5f, 5.2f, 7.3f };
-	Matrix4x4 translateMatrix = MakeTranslateMatrix(translate);
-	Matrix4x4 scaleMatrix = MakeScaleMatrix(scale);
-	Vector3 point{ 2.3f, 3.8f, 1.4f };
-	Matrix4x4 transformMatrix = {
-		1.0f, 2.0f, 3.0f, 4.0f,
-		3.0f, 1.0f, 1.0f, 2.0f,
-		1.0f, 4.0f, 2.0f, 3.0f,
-		2.0f, 2.0f, 1.0f, 3.0f
-	};
-	Vector3 transformed = Transform(point, transformMatrix);
-
-	Matrix4x4 m1 = {
-		3.2f, 0.7f, 9.6f, 4.4f,
-		5.5f, 1.3f, 7.8f, 2.1f,
-		6.9f, 8.0f, 2.6f, 1.0f,
-		0.5f, 7.2f, 5.1f, 3.3f
-	};
-
-	Matrix4x4 m2 = {
-		4.1f, 6.5f, 3.3f, 2.2f,
-		8.8f, 0.6f, 9.9f, 7.7f,
-		1.1f, 5.5f, 6.6f, 0.0f,
-		3.3f, 9.9f, 8.8f, 2.2f
-	};
-
-	Matrix4x4 resultAdd = Add(m1, m2);
-	Matrix4x4 resultMultiply = Multiply(m1, m2);
-	Matrix4x4 resultSubtract = Subtract(m1, m2);
-	Matrix4x4 inverseM1 = Inverse(m1);
-	Matrix4x4 inverseM2 = Inverse(m2);
-	Matrix4x4 transposeM1 = Transpose(m1);
-	Matrix4x4 transposeM2 = Transpose(m2);
-	Matrix4x4 identity = MakeIdentity4x4();
+	Vector3 point{ -1.5f, 0.6f, 0.6f };
 
 	// ウィンドウの×ボタンが押されるまでループ
 	while (Novice::ProcessMessage() == 0) {
@@ -90,17 +56,31 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 		/// ↓更新処理ここから
 		///
 
+		// pointを線分に投影したベクトル
+		Vector3 project = VectorProject(point - segment.origin, segment.difference);
+
+		// pointに対する線分上の最近接点
+		Vector3 closestPoint = ClosestPoint(point, segment);
+
+		Sphere pointSphere{ point, 0.01f };
+
+		Sphere closestPointSphere{ closestPoint, 0.01f };
+
 		ImGui::Begin("debug");
 
+		cameraPosition = camera->GetTranslate();
 		ImGui::DragFloat3("cameraTranslate", &cameraPosition.x, 0.0625f);
+		camera->SetTranslate(cameraPosition);
 
+		cameraRotate = camera->GetRotate();
 		ImGui::DragFloat3("cameraRotate", &cameraRotate.x, 0.0625f);
+		camera->SetRotate(cameraRotate);
 
-		ImGui::DragFloat3("sphereCenter", &sphere.center.x, 0.0625f);
-
-		ImGui::DragFloat("sphereRadius", &sphere.radius, 0.0625f);
+		ImGui::Text("Project: (%8.3f, %8.3f, %8.3f)", project.x, project.y, project.z);
 
 		ImGui::End();
+
+		camera->MatrixUpdate();
 
 		///
 		/// ↑更新処理ここまで
@@ -110,46 +90,17 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 		/// ↓描画処理ここから
 		///
 
-		Matrix4x4 cameraMatrix = MakeWorldMatrix(cameraPosition, Vector3{ 1.0f, 1.0f, 1.0f }, cameraRotate);
+		DrawGrid(camera->GetViewProjectionMatrix(), camera->GetViewportMatrix());
 
-		Matrix4x4 viewMatrix = Inverse(cameraMatrix);
+		Vector3 start = Transform(Transform(segment.origin, camera->GetViewProjectionMatrix()), camera->GetViewportMatrix());
 
-		Matrix4x4 projectionMatrix = MakePerspectiveFovMatrix(0.45f, kWindowWidth / kWindowHeight, 0.1f, 100.0f);
+		Vector3 end = Transform(Transform(segment.origin + segment.difference, camera->GetViewProjectionMatrix()), camera->GetViewportMatrix());
 
-		Matrix4x4 viewProjectionMatrix = viewMatrix * projectionMatrix;
+		NoviceUtility::DrawLine(start, end, WHITE);
 
-		Matrix4x4 viewportMatrix = MakeViewportMatrix(0.0f, 0.0f, kWindowWidth, kWindowHeight, 0.0f, 1.0f);
+		DrawSphere(pointSphere, camera->GetViewProjectionMatrix(), camera->GetViewportMatrix(), RED);
 
-		DrawGrid(viewProjectionMatrix, viewportMatrix);
-
-		DrawSphere(sphere, viewProjectionMatrix, viewportMatrix, 0x333333FF);
-
-
-		MatrixScreenPrintf(0, 0, worldMatrix, "worldMatrix");
-
-
-		MatrixScreenPrintf(300, 0, resultAdd, "Add");
-
-		MatrixScreenPrintf(300, kMatrixPrintRowHeight * 5, resultSubtract, "Subtract");
-
-		MatrixScreenPrintf(300, kMatrixPrintRowHeight * 5 * 2, resultMultiply, "Multiply");
-
-		MatrixScreenPrintf(300, kMatrixPrintRowHeight * 5 * 3, inverseM1, "inverseM1");
-		
-		MatrixScreenPrintf(300, kMatrixPrintRowHeight * 5 * 4, inverseM2, "inverseM2");
-
-		MatrixScreenPrintf(300 + kMatrixPrintColumnWidth * 5, 0, transposeM1, "transposeM1");
-
-		MatrixScreenPrintf(300 + kMatrixPrintColumnWidth * 5, kMatrixPrintRowHeight * 5, transposeM2, "transposeM2");
-
-		MatrixScreenPrintf(300 + kMatrixPrintColumnWidth * 5, kMatrixPrintRowHeight * 5 * 2, identity, "identity");
-
-
-		VectorScreenPrintf(900, 0, transformed, "transformed");
-
-		MatrixScreenPrintf(900, kMatrixPrintRowHeight * 5, translateMatrix, "translateMatrix");
-
-		MatrixScreenPrintf(900, kMatrixPrintRowHeight * 5 * 2, scaleMatrix, "scaleMatrix");
+		DrawSphere(closestPointSphere, camera->GetViewProjectionMatrix(), camera->GetViewportMatrix(), BLACK);
 
 		///
 		/// ↑描画処理ここまで
