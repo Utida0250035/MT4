@@ -17,7 +17,7 @@ inline Vector2 VectorNorm(const Vector2& me) {
 
 	float length = VectorLength(me);
 
-	if (length == 0.0f) {
+	if (length < 0.00001f) {
 
 		return { 0.0, 0.0f };
 

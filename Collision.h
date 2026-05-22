@@ -3,6 +3,14 @@
 #include "Sphere.h"
 #include "Plane.h"
 
+#include "Line.h"
+
 bool IsHitSpheres(const Sphere& sphere1, const Sphere& sphere2);
 
 bool IsSphereHitPlane(const Sphere& sphere, const Plane& plane);
+
+bool IsLineHitPlane(const Line& line, const Plane& plane);
+
+bool IsSegmentHitPlane(const Segment& segment, const Plane& plane);
+
+bool IsRayHitPlane(const Ray& ray, const Plane& plane);

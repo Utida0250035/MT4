@@ -30,7 +30,7 @@ void VectorScreenPrintf(int x, int y, const Vector3& vector, const char* label) 
 
 Vector3 PerpendicularAny(const Vector3& vector) {
 
-	if (vector.x != 0.0f || vector.y != 0.0f) {
+	if (std::abs(vector.x) >= 0.00001f || std::abs(vector.y) >= 0.00001f) {
 
 		return { -vector.y, vector.x, 0.0f };
 
