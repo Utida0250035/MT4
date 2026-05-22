@@ -223,6 +223,12 @@ inline constexpr Vector3 Transform(const Vector3& vector, const Matrix4x4& matri
 
 }
 
+inline constexpr Vector3 ScreenTransform(const Vector3& vector, const Matrix4x4& viewProjectionMatrix, const Matrix4x4& viewportMatrix) {
+
+	return Transform(Transform(vector, viewProjectionMatrix), viewportMatrix);
+
+}
+
 Matrix4x4 MakeXRotateMatrix(const float& angle);
 
 Matrix4x4 MakeYRotateMatrix(const float& angle);
