@@ -4,7 +4,7 @@
 #include <algorithm>
 
 float VectorLength(const Vector3& vector) {
-
+	
 	return std::sqrtf(VectorLengthSquare(vector));
 
 }

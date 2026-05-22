@@ -1,5 +1,6 @@
 ﻿#pragma once
 #include "Matrix3D.h"
+#include "Vector2.h"
 
 class Camera {
 
@@ -43,12 +44,35 @@ private:
 	// ビューポート変換行列
 	Matrix4x4 viewportMatrix_{};
 
+
+	// 角速度
+	Vector3 angularVelocity_{};
+	
+	// 速度
+	Vector3 velocity_{};
+
+	// 前フレームのマウスカーソルの位置
+	Vector2 preCursorPos_{};
+
+	// マウスカーソルの位置
+	Vector2 cursorPos_{};
+
 public:
+
+	/// <summary>
+	/// 移動入力
+	/// </summary>
+	void MoveInput();
+
+	/// <summary>
+	/// 移動
+	/// </summary>
+	void Move();
 
 	/// <summary>
 	/// 行列の更新
 	/// </summary>
-	void MatrixUpdate();
+	void Update();
 
 	/// <summary>
 	/// ゲッター

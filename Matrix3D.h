@@ -229,6 +229,12 @@ Matrix4x4 MakeYRotateMatrix(const float& angle);
 
 Matrix4x4 MakeZRotateMatrix(const float& angle);
 
+inline constexpr Matrix4x4 MakeRotateMatrix(const Vector3& rotate) {
+
+	return MakeXRotateMatrix(rotate.x) * MakeYRotateMatrix(rotate.y) * MakeZRotateMatrix(rotate.z);
+
+}
+
 Matrix4x4 MakeWorldMatrix(const Vector3& translation, const Vector3& scale = Vector3{ 1.0f, 1.0f, 1.0f }, const Vector3& rotation = Vector3{0.0f, 0.0f, 0.0f});
 
 Matrix4x4 MakeAffineMatrix(const Vector3& scale, const Vector3& rotate, const Vector3& translate);

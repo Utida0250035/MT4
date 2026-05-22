@@ -1,4 +1,5 @@
 ﻿#include "Camera.h"
+#include "Collision.h"
 #include "DrawShapes.h"
 #include "Matrix3D.h"
 #include "Sphere.h"
@@ -38,9 +39,10 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 	Vector3 cameraPosition{};
 	Vector3 cameraRotate{};
 
-	Segment segment{ {-2.0f, -1.0f, 0.0f}, {3.0f, 2.0f, 2.0f} };
+	Sphere sphere1 = { Vector3{}, 0.5f };
+	Sphere sphere2 = { Vector3{1.0f, 1.0f, 1.0f}, 0.3f };
 
-	Vector3 point{ -1.5f, 0.6f, 0.6f };
+	bool isHit = false;
 
 	// ウィンドウの×ボタンが押されるまでループ
 	while (Novice::ProcessMessage() == 0) {
@@ -56,17 +58,7 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 		/// ↓更新処理ここから
 		///
 
-		// pointを線分に投影したベクトル
-		Vector3 project = VectorProject(point - segment.origin, segment.difference);
-
-		// pointに対する線分上の最近接点
-		Vector3 closestPoint = ClosestPoint(point, segment);
-
-		Sphere pointSphere{ point, 0.01f };
-
-		Sphere closestPointSphere{ closestPoint, 0.01f };
-
-		ImGui::Begin("debug");
+		ImGui::Begin("camera");
 
 		cameraPosition = camera->GetTranslate();
 		ImGui::DragFloat3("cameraTranslate", &cameraPosition.x, 0.0625f);
@@ -76,11 +68,30 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 		ImGui::DragFloat3("cameraRotate", &cameraRotate.x, 0.0625f);
 		camera->SetRotate(cameraRotate);
 
-		ImGui::Text("Project: (%8.3f, %8.3f, %8.3f)", project.x, project.y, project.z);
+		ImGui::End();
+
+		camera->Update();
+
+
+		ImGui::Begin("sphere1");
+
+		ImGui::DragFloat3("center", &sphere1.center.x, 0.03125f);
+
+		ImGui::DragFloat("radius", &sphere1.radius, 0.03125f);
 
 		ImGui::End();
 
-		camera->MatrixUpdate();
+
+		ImGui::Begin("sphere2");
+
+		ImGui::DragFloat3("center", &sphere2.center.x, 0.03125f);
+
+		ImGui::DragFloat("radius", &sphere2.radius, 0.03125f);
+
+		ImGui::End();
+
+		
+		isHit = IsHitSpheres(sphere1, sphere2);
 
 		///
 		/// ↑更新処理ここまで
@@ -92,15 +103,17 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 
 		DrawGrid(camera->GetViewProjectionMatrix(), camera->GetViewportMatrix());
 
-		Vector3 start = Transform(Transform(segment.origin, camera->GetViewProjectionMatrix()), camera->GetViewportMatrix());
+		uint32_t spheresColor = BLACK;
 
-		Vector3 end = Transform(Transform(segment.origin + segment.difference, camera->GetViewProjectionMatrix()), camera->GetViewportMatrix());
+		if (isHit) {
 
-		NoviceUtility::DrawLine(start, end, WHITE);
+			spheresColor = RED;
 
-		DrawSphere(pointSphere, camera->GetViewProjectionMatrix(), camera->GetViewportMatrix(), RED);
+		}
 
-		DrawSphere(closestPointSphere, camera->GetViewProjectionMatrix(), camera->GetViewportMatrix(), BLACK);
+		DrawSphere(sphere1, camera->GetViewProjectionMatrix(), camera->GetViewportMatrix(), spheresColor);
+
+		DrawSphere(sphere2, camera->GetViewProjectionMatrix(), camera->GetViewportMatrix(), spheresColor);
 
 		///
 		/// ↑描画処理ここまで
