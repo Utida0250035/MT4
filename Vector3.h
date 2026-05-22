@@ -106,3 +106,5 @@ static constexpr int kVectorPrintColumnWidth = 60;
 static constexpr int kVectorPrintRowHeight = 20;
 
 void VectorScreenPrintf(int x, int y, const Vector3& vector, const char* label);
+
+Vector3 PerpendicularAny(const Vector3& vector);
