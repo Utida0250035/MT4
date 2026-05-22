@@ -11,6 +11,7 @@
 #include <numbers>
 #include <ImGui.h>
 #include <memory>
+#include <string>
 
 // 個人: クラス記号_出席番号_氏_名_タイトル
 // チーム: チームNo_タイトル
@@ -39,8 +40,15 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 	Vector3 cameraPosition{};
 	Vector3 cameraRotate{};
 
-	Sphere sphere1 = { Vector3{}, 0.5f };
-	Sphere sphere2 = { Vector3{1.0f, 1.0f, 1.0f}, 0.3f };
+	Sphere sphere = { Vector3{}, 0.5f };
+
+	Vector3 planeMakerPoints[3] = {
+		Vector3{0.5f, 1.0f, 0.0f},
+		Vector3{1.0f, 1.0f, 0.5f},
+		Vector3{2.0f, 1.0f, 2.0f}
+	};
+
+	Plane plane = MakePlane(planeMakerPoints[0], planeMakerPoints[1], planeMakerPoints[2]);
 
 	bool isHit = false;
 
@@ -73,25 +81,40 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 		camera->Update();
 
 
-		ImGui::Begin("sphere1");
+		ImGui::Begin("sphere");
 
-		ImGui::DragFloat3("center", &sphere1.center.x, 0.03125f);
+		ImGui::DragFloat3("center", &sphere.center.x, 0.03125f);
 
-		ImGui::DragFloat("radius", &sphere1.radius, 0.03125f);
-
-		ImGui::End();
-
-
-		ImGui::Begin("sphere2");
-
-		ImGui::DragFloat3("center", &sphere2.center.x, 0.03125f);
-
-		ImGui::DragFloat("radius", &sphere2.radius, 0.03125f);
+		ImGui::DragFloat("radius", &sphere.radius, 0.03125f);
 
 		ImGui::End();
 
-		
-		isHit = IsHitSpheres(sphere1, sphere2);
+
+		ImGui::Begin("plane");
+
+		ImGui::DragFloat3("normal", &plane.normal.x, 0.03125f);
+
+		ImGui::DragFloat("distance", &plane.distance, 0.03125f);
+
+		ImGui::Text("");
+
+		for (uint32_t i = 0; i < 3; ++i) {
+
+			ImGui::DragFloat3(std::string("makerPoint" + std::to_string(i)).c_str(), &planeMakerPoints[i].x, 0.03125f);
+
+		}
+
+		ImGui::SmallButton("setPlane");
+
+		if (ImGui::IsItemActivated()) {
+
+			plane = MakePlane(planeMakerPoints);
+
+		}
+
+		ImGui::End();
+
+		isHit = IsSphereHitPlane(sphere, plane);
 
 		///
 		/// ↑更新処理ここまで
@@ -103,17 +126,27 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 
 		DrawGrid(camera->GetViewProjectionMatrix(), camera->GetViewportMatrix());
 
-		uint32_t spheresColor = BLACK;
+		uint32_t objectsColor = BLACK;
 
 		if (isHit) {
 
-			spheresColor = RED;
+			objectsColor = RED;
 
 		}
 
-		DrawSphere(sphere1, camera->GetViewProjectionMatrix(), camera->GetViewportMatrix(), spheresColor);
+		DrawSphere(sphere, camera->GetViewProjectionMatrix(), camera->GetViewportMatrix(), objectsColor);
 
-		DrawSphere(sphere2, camera->GetViewProjectionMatrix(), camera->GetViewportMatrix(), spheresColor);
+		DrawPlane(plane, camera->GetViewProjectionMatrix(), camera->GetViewportMatrix(), objectsColor);
+		
+		Sphere pointSphere{ Vector3{}, 0.05f };
+
+		for (const auto& point : planeMakerPoints) {
+
+			pointSphere.center = point;
+
+			DrawSphere(pointSphere, camera->GetViewProjectionMatrix(), camera->GetViewportMatrix(), GREEN);
+
+		}
 
 		///
 		/// ↑描画処理ここまで

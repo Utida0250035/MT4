@@ -90,7 +90,7 @@ void DrawGrid(const Matrix4x4& viewProjectionMatrix, const Matrix4x4& viewportMa
 
 void DrawSphere(const Sphere& sphere, const Matrix4x4& viewProjectionMatrix, const Matrix4x4& viewportMatrix, const uint32_t color) {
 
-	const uint32_t kSubdivision = 12;
+	const uint32_t kSubdivision = 8;
 	const float kLonEvery = std::numbers::pi_v<float> *2.0f / static_cast<float>(kSubdivision);
 	const float kLatEvery = std::numbers::pi_v<float> / static_cast<float>(kSubdivision);
 
@@ -136,4 +136,39 @@ void DrawSphere(const Sphere& sphere, const Matrix4x4& viewProjectionMatrix, con
 
 
 	}
+
+}
+
+void DrawPlane(const Plane& plane, const Matrix4x4& viewProjectionMatrix, const Matrix4x4& viewportMatrix, uint32_t color) {
+
+	// 矩形の中心を選定
+	Vector3 planeCenter = plane.distance * plane.normal;
+
+	// 平面の法線と垂直なベクトル4つ
+	Vector3 perpendiculars[4];
+
+	perpendiculars[0] = VectorNormalize(PerpendicularAny(plane.normal));
+	perpendiculars[1] = { -perpendiculars[0].x, -perpendiculars[0].y, -perpendiculars[0].z };
+	perpendiculars[2] = VectorCross(plane.normal, perpendiculars[0]);
+	perpendiculars[3] = { -perpendiculars[2].x, -perpendiculars[2].y, -perpendiculars[2].z };
+
+	// 平面に含まれる矩形の4頂点
+	Vector3 points[4]{};
+
+	for (size_t i = 0; i < 4; ++i) {
+
+		Vector3 extend = 2.0f * perpendiculars[i];
+		Vector3 point = planeCenter + extend;
+		points[i] = Transform(Transform(point, viewProjectionMatrix), viewportMatrix);
+
+	}
+
+	NoviceUtility::DrawLine(points[2], points[0], color);
+
+	NoviceUtility::DrawLine(points[2], points[1], color);
+
+	NoviceUtility::DrawLine(points[3], points[0], color);
+
+	NoviceUtility::DrawLine(points[3], points[1], color);
+
 }

@@ -27,3 +27,15 @@ void VectorScreenPrintf(int x, int y, const Vector3& vector, const char* label) 
 	Novice::ScreenPrintf(x + kVectorPrintColumnWidth * 3, y, "%s", label);
 
 }
+
+Vector3 PerpendicularAny(const Vector3& vector) {
+
+	if (vector.x != 0.0f || vector.y != 0.0f) {
+
+		return { -vector.y, vector.x, 0.0f };
+
+	}
+
+	return { 0.0f, -vector.x, vector.y };
+
+}
