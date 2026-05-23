@@ -140,5 +140,6 @@
     <ClInclude Include="Collision.h" />
     <ClInclude Include="Vector2.h" />
     <ClInclude Include="Plane.h" />
+    <ClInclude Include="Triangle.h" />
   </ItemGroup>
 </Project>

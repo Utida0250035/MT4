@@ -1,6 +1,7 @@
 ﻿#pragma once
 
 #include "Matrix3D.h"
+#include "Triangle.h"
 #include "Sphere.h"
 #include "Plane.h"
 #include "Line.h"
@@ -17,3 +18,5 @@ void DrawLine(const Line& line, const Matrix4x4& viewProjectionMatrix, const Mat
 void DrawRay(const Ray& ray, const Matrix4x4& viewProjectionMatrix, const Matrix4x4& viewportMatrix, uint32_t color);
 
 void DrawSegment(const Segment& segment, const Matrix4x4& viewProjectionMatrix, const Matrix4x4& viewportMatrix, uint32_t color);
+
+void DrawTriangle(const Triangle& triangle, const Matrix4x4& viewProjectionMatrix, const Matrix4x4& viewportMatrix, uint32_t color);
