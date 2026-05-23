@@ -94,6 +94,12 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 
 		ImGui::DragFloat3("normal", &plane.normal.x, 0.03125f);
 
+		if (ImGui::IsItemActive()) {
+
+			plane.normal = VectorNormalize(plane.normal);
+
+		}
+
 		ImGui::DragFloat("distance", &plane.distance, 0.03125f);
 
 		ImGui::Text("");
