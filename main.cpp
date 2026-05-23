@@ -40,15 +40,13 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 	Vector3 cameraPosition{};
 	Vector3 cameraRotate{};
 
-	Vector3 planeMakerPoints[3] = {
+	Triangle triangle{
 		Vector3{0.5f, 1.0f, 0.0f},
 		Vector3{1.0f, 1.0f, 0.5f},
 		Vector3{2.0f, 1.0f, 2.0f}
 	};
 
-	Plane plane = MakePlane(planeMakerPoints[0], planeMakerPoints[1], planeMakerPoints[2]);
-
-	Sphere sphere = Sphere{ Vector3{1.0f, 1.0f, 1.0f} , 0.5f };
+	Segment segment = Segment{ Vector3{1.0f, 1.0f, 1.0f} ,Vector3{1.0f, 1.0f, 1.0f} };
 
 	bool isHit = false;
 
@@ -81,46 +79,26 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 		camera->Update();
 
 
-		ImGui::Begin("sphere");
+		ImGui::Begin("segemnt");
 
-		ImGui::DragFloat3("center", &sphere.center.x, 0.03125f);
+		ImGui::DragFloat3("origin", &segment.origin.x, 0.03125f);
 
-		ImGui::DragFloat("radius", &sphere.radius, 0.03125f);
+		ImGui::DragFloat3("difference", &segment.difference.x, 0.03125f);
 
 		ImGui::End();
 
 
-		ImGui::Begin("plane");
-
-		ImGui::DragFloat3("normal", &plane.normal.x, 0.03125f);
-
-		if (ImGui::IsItemActive()) {
-
-			plane.normal = VectorNormalize(plane.normal);
-
-		}
-
-		ImGui::DragFloat("distance", &plane.distance, 0.03125f);
-
-		ImGui::Text("");
+		ImGui::Begin("triangle");
 
 		for (uint32_t i = 0; i < 3; ++i) {
 
-			ImGui::DragFloat3(std::string("makerPoint" + std::to_string(i)).c_str(), &planeMakerPoints[i].x, 0.03125f);
-
-		}
-
-		ImGui::SmallButton("setPlane");
-
-		if (ImGui::IsItemActivated()) {
-
-			plane = MakePlane(planeMakerPoints);
+			ImGui::DragFloat3(std::string("vertex" + std::to_string(i)).c_str(), &triangle.vertices[i].x, 0.03125f);
 
 		}
 
 		ImGui::End();
 
-		isHit = IsSphereHitPlane(sphere, plane);
+		isHit = IsSegmentHitTriangle(segment, triangle);
 
 		///
 		/// ↑更新処理ここまで
@@ -140,19 +118,9 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 
 		}
 
-		DrawSphere(sphere, camera->GetViewProjectionMatrix(), camera->GetViewportMatrix(), objectsColor);
+		DrawSegment(segment, camera->GetViewProjectionMatrix(), camera->GetViewportMatrix(), objectsColor);
 
-		DrawPlane(plane, camera->GetViewProjectionMatrix(), camera->GetViewportMatrix(), objectsColor);
-		
-		Sphere pointSphere{ Vector3{}, 0.05f };
-
-		for (const auto& point : planeMakerPoints) {
-
-			pointSphere.center = point;
-
-			DrawSphere(pointSphere, camera->GetViewProjectionMatrix(), camera->GetViewportMatrix(), GREEN);
-
-		}
+		DrawTriangle(triangle, camera->GetViewProjectionMatrix(), camera->GetViewportMatrix(), objectsColor);
 
 		///
 		/// ↑描画処理ここまで

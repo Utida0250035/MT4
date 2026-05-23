@@ -230,3 +230,19 @@ void DrawSegment(const Segment& segment, const Matrix4x4& viewProjectionMatrix, 
 	}
 
 }
+
+void DrawTriangle(const Triangle& triangle, const Matrix4x4& viewProjectionMatrix, const Matrix4x4& viewportMatrix, uint32_t color) {
+
+	Vector3 verticesScreen[3] = {
+		ScreenTransform(triangle.vertices[0], viewProjectionMatrix, viewportMatrix),
+		ScreenTransform(triangle.vertices[1], viewProjectionMatrix, viewportMatrix),
+		ScreenTransform(triangle.vertices[2], viewProjectionMatrix, viewportMatrix),
+	};
+
+	NoviceUtility::DrawLine(verticesScreen[0], verticesScreen[1], color);
+
+	NoviceUtility::DrawLine(verticesScreen[1], verticesScreen[2], color);
+
+	NoviceUtility::DrawLine(verticesScreen[2], verticesScreen[0], color);
+
+}
