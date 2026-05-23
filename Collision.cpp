@@ -30,3 +30,73 @@ bool IsSphereHitPlane(const Sphere& sphere, const Plane& plane){
 	return false;
 
 }
+
+bool CalcT(const Vector3& origin, const Vector3& difference, const Plane& plane, float& t) {
+
+	float dot = VectorDot(difference, plane.normal);
+
+	if (std::abs(dot) <= 0.00001f) {
+
+		return false;
+
+	}
+
+	t = (plane.distance - VectorDot(origin, plane.normal)) / dot;
+
+	return true;
+
+}
+
+bool IsLineHitPlane(const Line& line, const Plane& plane) {
+
+	float t = 0.0f;
+
+	if (!CalcT(line.origin, line.difference, plane, t)) {
+
+		return false;
+
+	}
+
+	return true;
+
+}
+
+bool IsSegmentHitPlane(const Segment& segment, const Plane& plane) {
+
+	float t = 0.0f;
+
+	if (!CalcT(segment.origin, segment.difference, plane, t)) {
+
+		return false;
+
+	}
+
+	if (t <= 1.0f && t >= 0.0f) {
+
+		return true;
+
+	}
+
+	return false;
+
+}
+
+bool IsRayHitPlane(const Ray& ray, const Plane& plane) {
+
+	float t = 0.0f;
+
+	if (!CalcT(ray.origin, ray.difference, plane, t)) {
+
+		return false;
+
+	}
+
+	if (t >= 0.0f) {
+
+		return true;
+
+	}
+
+	return false;
+
+}

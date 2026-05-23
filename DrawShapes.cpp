@@ -159,7 +159,7 @@ void DrawPlane(const Plane& plane, const Matrix4x4& viewProjectionMatrix, const 
 
 		Vector3 extend = 2.0f * perpendiculars[i];
 		Vector3 point = planeCenter + extend;
-		points[i] = Transform(Transform(point, viewProjectionMatrix), viewportMatrix);
+		points[i] = ScreenTransform(point, viewProjectionMatrix, viewportMatrix);
 
 	}
 
@@ -170,5 +170,63 @@ void DrawPlane(const Plane& plane, const Matrix4x4& viewProjectionMatrix, const 
 	NoviceUtility::DrawLine(points[3], points[0], color);
 
 	NoviceUtility::DrawLine(points[3], points[1], color);
+
+}
+
+void DrawLine(const Line& line, const Matrix4x4& viewProjectionMatrix, const Matrix4x4& viewportMatrix, uint32_t color) {
+
+	const float virtualLength = 32.0f;
+
+	Vector3 virtualEndPos = line.origin + VectorNormalize(line.difference) * virtualLength;
+
+	Vector3 lineEndPosScreen[2] = {
+		ScreenTransform(line.origin, viewProjectionMatrix, viewportMatrix),
+		ScreenTransform(virtualEndPos, viewProjectionMatrix, viewportMatrix)
+	};
+
+	NoviceUtility::DrawLine(lineEndPosScreen[0], lineEndPosScreen[1], color);
+
+}
+
+void DrawRay(const Ray& ray, const Matrix4x4& viewProjectionMatrix, const Matrix4x4& viewportMatrix, uint32_t color) {
+
+	const float virtualLength = 32.0f;
+
+	Vector3 virtualEndPos = ray.origin + VectorNormalize(ray.difference) * virtualLength;
+
+	Vector3 lineEndPosScreen[2] = {
+		ScreenTransform(ray.origin, viewProjectionMatrix, viewportMatrix),
+		ScreenTransform(virtualEndPos, viewProjectionMatrix, viewportMatrix)
+	};
+
+	NoviceUtility::DrawLine(lineEndPosScreen[0], lineEndPosScreen[1], color);
+
+	Sphere lineEndSphere = Sphere{ray.origin, 0.05f};
+
+	DrawSphere(lineEndSphere, viewProjectionMatrix, viewportMatrix, 0xFFFFFFFF);
+
+}
+
+void DrawSegment(const Segment& segment, const Matrix4x4& viewProjectionMatrix, const Matrix4x4& viewportMatrix, uint32_t color) {
+
+	Vector3 endPos = segment.origin + segment.difference;
+
+	Vector3 lineEndPosScreen[2] = {
+		ScreenTransform(segment.origin, viewProjectionMatrix, viewportMatrix),
+		ScreenTransform(endPos, viewProjectionMatrix, viewportMatrix)
+	};
+
+	NoviceUtility::DrawLine(lineEndPosScreen[0], lineEndPosScreen[1], color);
+
+	Sphere lineEndSpheres[2] = {
+		Sphere{segment.origin, 0.05f},
+		Sphere{endPos, 0.05f}
+	};
+
+	for (const auto& sphere : lineEndSpheres) {
+
+		DrawSphere(sphere, viewProjectionMatrix, viewportMatrix, 0xFFFFFFFF);
+
+	}
 
 }
