@@ -48,7 +48,7 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 
 	Plane plane = MakePlane(planeMakerPoints[0], planeMakerPoints[1], planeMakerPoints[2]);
 
-	Segment segment = Segment{ Vector3{1.0f, 1.0f, 1.0f} , Vector3{-1.0f, -1.0f, -1.0f} };
+	Sphere sphere = Sphere{ Vector3{1.0f, 1.0f, 1.0f} , 0.5f };
 
 	bool isHit = false;
 
@@ -81,11 +81,11 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 		camera->Update();
 
 
-		ImGui::Begin("segment");
+		ImGui::Begin("sphere");
 
-		ImGui::DragFloat3("origin", &segment.origin.x, 0.03125f);
+		ImGui::DragFloat3("center", &sphere.center.x, 0.03125f);
 
-		ImGui::DragFloat3("difference", &segment.difference.x, 0.03125f);
+		ImGui::DragFloat("radius", &sphere.radius, 0.03125f);
 
 		ImGui::End();
 
@@ -120,7 +120,7 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 
 		ImGui::End();
 
-		isHit = IsSegmentHitPlane(segment, plane);
+		isHit = IsSphereHitPlane(sphere, plane);
 
 		///
 		/// ↑更新処理ここまで
@@ -140,7 +140,7 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 
 		}
 
-		DrawSegment(segment, camera->GetViewProjectionMatrix(), camera->GetViewportMatrix(), objectsColor);
+		DrawSphere(sphere, camera->GetViewProjectionMatrix(), camera->GetViewportMatrix(), objectsColor);
 
 		DrawPlane(plane, camera->GetViewProjectionMatrix(), camera->GetViewportMatrix(), objectsColor);
 		
