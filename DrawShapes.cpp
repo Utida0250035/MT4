@@ -1,5 +1,6 @@
 ﻿#include "DrawShapes.h"
 #include "NoviceUtility.h"
+#include <Novice.h>
 #include <cmath>
 #include <numbers>
 #include <stdint.h>
@@ -98,7 +99,7 @@ void DrawSphere(const Sphere& sphere, const Matrix4x4& viewProjectionMatrix, con
 
 	for (size_t i = 0; i < kSubdivision; ++i) {
 
-		float lat = -(std::numbers::pi_v<float> * 0.5f) + kLatEvery * static_cast<float>(i);
+		float lat = -(std::numbers::pi_v<float> *0.5f) + kLatEvery * static_cast<float>(i);
 
 		for (size_t j = 0; j < kSubdivision; ++j) {
 
@@ -201,7 +202,7 @@ void DrawRay(const Ray& ray, const Matrix4x4& viewProjectionMatrix, const Matrix
 
 	NoviceUtility::DrawLine(lineEndPosScreen[0], lineEndPosScreen[1], color);
 
-	Sphere lineEndSphere = Sphere{ray.origin, 0.05f};
+	Sphere lineEndSphere = Sphere{ ray.origin, 0.05f };
 
 	DrawSphere(lineEndSphere, viewProjectionMatrix, viewportMatrix, 0xFFFFFFFF);
 
@@ -239,10 +240,12 @@ void DrawTriangle(const Triangle& triangle, const Matrix4x4& viewProjectionMatri
 		ScreenTransform(triangle.vertices[2], viewProjectionMatrix, viewportMatrix),
 	};
 
-	NoviceUtility::DrawLine(verticesScreen[0], verticesScreen[1], color);
-
-	NoviceUtility::DrawLine(verticesScreen[1], verticesScreen[2], color);
-
-	NoviceUtility::DrawLine(verticesScreen[2], verticesScreen[0], color);
+	Novice::DrawTriangle(
+		static_cast<int>(verticesScreen[0].x), static_cast<int>(verticesScreen[0].y),
+		static_cast<int>(verticesScreen[1].x), static_cast<int>(verticesScreen[1].y),
+		static_cast<int>(verticesScreen[2].x), static_cast<int>(verticesScreen[2].y),
+		color,
+		kFillModeWireFrame
+	);
 
 }
