@@ -1,6 +1,7 @@
 ﻿#include "Collision.h"
-#include <cmath> 
+#include <cmath>
 #include <algorithm>
+#include <limits>
 
 bool IsHitSpheres(const Sphere& sphere1, const Sphere& sphere2) {
 
@@ -241,7 +242,7 @@ bool IsSegmentHitTriangle(const Segment& segment, const Triangle& triangle) {
 
 }
 
-bool IsHitAABBs(const AABB& box1, const AABB& box2){
+bool IsHitAABBs(const AABB& box1, const AABB& box2) {
 
 	if (box1.min.x <= box2.max.x && box1.max.x >= box2.min.x) {
 
@@ -278,3 +279,134 @@ bool IsSphereHitAABB(const Sphere& sphere, const AABB& aabb) {
 	return false;
 
 }
+
+bool IsPointHitAABB(const Vector3& point, const AABB& aabb) {
+
+	if (point.x <= aabb.max.x && point.x >= aabb.min.x) {
+
+		if (point.y <= aabb.max.y && point.y >= aabb.min.y) {
+
+			if (point.z <= aabb.max.z && point.z >= aabb.min.z) {
+
+				return true;
+
+			}
+
+		}
+
+	}
+
+	return false;
+
+}
+
+static bool IsGenericLineIntersectAABB(const Vector3& origin, const Vector3& difference, const AABB& aabb, float& tNear, float& tFar) {
+
+	tNear = -std::numeric_limits<float>::infinity();
+	tFar = std::numeric_limits<float>::infinity();
+
+	float originByArray[3] = { origin.x, origin.y, origin.z };
+	float differenceByArray[3] = { difference.x, difference.y, difference.z };
+	float boxMinByArray[3] = { aabb.min.x, aabb.min.y, aabb.min.z };
+	float boxMaxByArray[3] = { aabb.max.x, aabb.max.x, aabb.max.z };
+
+	float t1 = 0.0f;
+	float t2 = 0.0f;
+
+	for (size_t i = 0; i < 3; i++) {
+
+		if (std::abs(differenceByArray[i]) < 1e-5f) {
+
+			if (originByArray[i] < boxMinByArray[i] || originByArray[i] > boxMaxByArray[i]) {
+				// 線が軸に平行かつ始点がAABBの外側にある場合 衝突なし
+
+				return false;
+
+			}
+
+		} else {
+
+			t1 = (boxMinByArray[i] - originByArray[i]) / differenceByArray[i];
+			t2 = (boxMaxByArray[i] - originByArray[i]) / differenceByArray[i];
+
+			if (t1 > t2) {
+
+				std::swap(t1, t2);
+
+			}
+
+			tNear = std::max(tNear, t1);
+			tFar = std::min(tFar, t2);
+
+			if (tNear > tFar) {
+				// 区間崩壊 衝突なし
+
+				return false;
+
+			}
+
+		}
+
+	}
+
+	return true;
+
+}
+
+bool IsLineHitAABB(const Line& segment, const AABB& aabb) {
+
+	float tNear = 0.0f;
+	float tFar = 0.0f;
+
+	if (!IsGenericLineIntersectAABB(segment.origin, segment.difference, aabb, tNear, tFar)) {
+
+		return false;
+
+	}
+
+	return true;
+
+}
+
+bool IsRayHitAABB(const Ray& segment, const AABB& aabb) {
+
+	float tNear = 0.0f;
+	float tFar = 0.0f;
+
+	if (!IsGenericLineIntersectAABB(segment.origin, segment.difference, aabb, tNear, tFar)) {
+
+		return false;
+
+	}
+
+	if (tFar < 0.0f) {
+
+		return false;
+
+	}
+
+	return true;
+
+}
+
+bool IsSegmentHitAABB(const Segment& segment, const AABB& aabb) {
+
+	float tNear = 0.0f;
+	float tFar = 0.0f;
+
+	if (!IsGenericLineIntersectAABB(segment.origin, segment.difference, aabb, tNear, tFar)) {
+
+		return false;
+
+	}
+
+	if (tFar < 0.0f || tNear > 1.0f) {
+
+		return false;
+
+	}
+
+	return true;
+
+}
+
