@@ -4,6 +4,7 @@
 #include "Plane.h"
 #include "Line.h"
 #include "Triangle.h"
+#include "AABB.h"
 
 bool IsHitSpheres(const Sphere& sphere1, const Sphere& sphere2);
 
@@ -23,3 +24,5 @@ bool IsLineHitTriangle(const Line& line, const Triangle& triangle);
 bool IsRayHitTriangle(const Ray& ray, const Triangle& triangle);
 
 bool IsSegmentHitTriangle(const Segment& segment, const Triangle& triangle);
+
+bool IsHitAABBs(const AABB& box1, const AABB& box2);

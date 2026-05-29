@@ -249,3 +249,40 @@ void DrawTriangle(const Triangle& triangle, const Matrix4x4& viewProjectionMatri
 	);
 
 }
+
+void DrawAABB(const AABB& aabb, const Matrix4x4& viewProjectionMatrix, const Matrix4x4& viewportMatrix, uint32_t color) {
+
+	Vector3 verticesScreen[8] = {
+		// 右上奥
+		ScreenTransform(aabb.max, viewProjectionMatrix, viewportMatrix),
+		// 左上奥
+		ScreenTransform(Vector3{aabb.min.x, aabb.max.y, aabb.max.z}, viewProjectionMatrix, viewportMatrix),
+		// 左上手前
+		ScreenTransform(Vector3{aabb.min.x, aabb.max.y, aabb.min.z}, viewProjectionMatrix, viewportMatrix),
+		// 右上手前
+		ScreenTransform(Vector3{aabb.max.x, aabb.max.y, aabb.min.z}, viewProjectionMatrix, viewportMatrix),
+		
+		// 右下奥
+		ScreenTransform(Vector3{aabb.max.x, aabb.min.y, aabb.max.z}, viewProjectionMatrix, viewportMatrix),
+		// 左下奥
+		ScreenTransform(Vector3{aabb.min.x, aabb.min.y, aabb.max.z}, viewProjectionMatrix, viewportMatrix),
+		// 左下手前
+		ScreenTransform(aabb.min, viewProjectionMatrix, viewportMatrix),
+		// 右下手前
+		ScreenTransform(Vector3{aabb.max.x, aabb.min.y, aabb.min.z}, viewProjectionMatrix, viewportMatrix),
+	};
+
+	NoviceUtility::DrawLine(verticesScreen[0], verticesScreen[1], color);
+	NoviceUtility::DrawLine(verticesScreen[1], verticesScreen[2], color);
+	NoviceUtility::DrawLine(verticesScreen[2], verticesScreen[3], color);
+	NoviceUtility::DrawLine(verticesScreen[3], verticesScreen[0], color);
+	NoviceUtility::DrawLine(verticesScreen[4], verticesScreen[5], color);
+	NoviceUtility::DrawLine(verticesScreen[5], verticesScreen[6], color);
+	NoviceUtility::DrawLine(verticesScreen[6], verticesScreen[7], color);
+	NoviceUtility::DrawLine(verticesScreen[7], verticesScreen[4], color);
+	NoviceUtility::DrawLine(verticesScreen[0], verticesScreen[4], color);
+	NoviceUtility::DrawLine(verticesScreen[1], verticesScreen[5], color);
+	NoviceUtility::DrawLine(verticesScreen[2], verticesScreen[6], color);
+	NoviceUtility::DrawLine(verticesScreen[3], verticesScreen[7], color);
+
+}

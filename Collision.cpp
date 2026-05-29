@@ -239,3 +239,23 @@ bool IsSegmentHitTriangle(const Segment& segment, const Triangle& triangle) {
 	return IsPointInTriangle(contact, triangle, plane.normal);
 
 }
+
+bool IsHitAABBs(const AABB& box1, const AABB& box2){
+
+	if (box1.min.x <= box2.max.x && box1.max.x >= box2.min.x) {
+
+		if (box1.min.y <= box2.max.y && box1.max.y >= box2.min.y) {
+
+			if (box1.min.z <= box2.max.z && box1.max.z >= box2.min.z) {
+
+				return true;
+
+			}
+
+		}
+
+	}
+
+	return false;
+
+}
