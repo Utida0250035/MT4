@@ -40,18 +40,14 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 	Vector3 cameraPosition{};
 	Vector3 cameraRotate{};
 
-	AABB boxes[2] = {
+	AABB box{
+		.min{-0.5f, -0.5f, -0.5f},
+		.max{0.0f, 0.0f, 0.0f}
+	};
 
-		AABB{
-			.min{-0.5f, -0.5f, -0.5f},
-			.max{0.0f, 0.0f, 0.0f}
-		},
-
-		AABB{
-			.min{0.2f, 0.2f, 0.2f},
-			.max{1.0f, 1.0f, 1.0f}
-		}
-
+	Sphere sphere{
+		.center{1.0f, 1.0f, 1.0f},
+		.radius = 0.5f
 	};
 
 	bool isHit = false;
@@ -84,37 +80,39 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 
 		camera->Update();
 
+		ImGui::Begin("sphere");
 
-		ImGui::Begin("boxes");
+		ImGui::DragFloat3("center", &sphere.center.x, 0.03125f);
 
-		for (size_t i = 0; i < 2; ++i) {
+		ImGui::DragFloat("radius", &sphere.radius, 0.03125f);
 
-			ImGui::Text(("box" + std::to_string(i)).c_str());
-			ImGui::DragFloat3(("max" + std::to_string(i)).c_str(), &boxes[i].max.x, 0.03125f);
-			
-			if (ImGui::IsItemActive()) {
+		ImGui::End();
 
-				boxes[i].max.x = std::max(boxes[i].min.x, boxes[i].max.x);
-				boxes[i].max.y = std::max(boxes[i].min.y, boxes[i].max.y);
-				boxes[i].max.z = std::max(boxes[i].min.z, boxes[i].max.z);
+		ImGui::Begin("box");
 
-			}
-			
-			ImGui::DragFloat3(("min" + std::to_string(i)).c_str(), &boxes[i].min.x, 0.03125f);
+		ImGui::DragFloat3("max", &box.max.x, 0.03125f);
 
-			if (ImGui::IsItemActive()) {
+		if (ImGui::IsItemActive()) {
 
-				boxes[i].min.x = std::min(boxes[i].min.x, boxes[i].max.x);
-				boxes[i].min.y = std::min(boxes[i].min.y, boxes[i].max.y);
-				boxes[i].min.z = std::min(boxes[i].min.z, boxes[i].max.z);
+			box.max.x = std::max(box.min.x, box.max.x);
+			box.max.y = std::max(box.min.y, box.max.y);
+			box.max.z = std::max(box.min.z, box.max.z);
 
-			}
+		}
+
+		ImGui::DragFloat3("min", &box.min.x, 0.03125f);
+
+		if (ImGui::IsItemActive()) {
+
+			box.min.x = std::min(box.min.x, box.max.x);
+			box.min.y = std::min(box.min.y, box.max.y);
+			box.min.z = std::min(box.min.z, box.max.z);
 
 		}
 
 		ImGui::End();
 
-		isHit = IsHitAABBs(boxes[0], boxes[1]);
+		isHit = IsSphereHitAABB(sphere, box);
 
 		///
 		/// ↑更新処理ここまで
@@ -126,7 +124,7 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 
 		DrawGrid(camera->GetViewProjectionMatrix(), camera->GetViewportMatrix());
 
-		uint32_t objectsColor = BLACK;
+		uint32_t objectsColor = WHITE;
 
 		if (isHit) {
 
@@ -134,11 +132,9 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 
 		}
 
-		for (const auto& box : boxes) {
+		DrawSphere(sphere, camera->GetViewProjectionMatrix(), camera->GetViewportMatrix(), objectsColor);
 
-			DrawAABB(box, camera->GetViewProjectionMatrix(), camera->GetViewportMatrix(), objectsColor);
-
-		}
+		DrawAABB(box, camera->GetViewProjectionMatrix(), camera->GetViewportMatrix(), objectsColor);
 
 		///
 		/// ↑描画処理ここまで

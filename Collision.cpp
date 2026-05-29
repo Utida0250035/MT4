@@ -1,5 +1,6 @@
 ﻿#include "Collision.h"
 #include <cmath> 
+#include <algorithm>
 
 bool IsHitSpheres(const Sphere& sphere1, const Sphere& sphere2) {
 
@@ -253,6 +254,24 @@ bool IsHitAABBs(const AABB& box1, const AABB& box2){
 			}
 
 		}
+
+	}
+
+	return false;
+
+}
+
+bool IsSphereHitAABB(const Sphere& sphere, const AABB& aabb) {
+
+	Vector3 closestPoint{
+		std::clamp(sphere.center.x, aabb.min.x, aabb.max.x),
+		std::clamp(sphere.center.y, aabb.min.y, aabb.max.y),
+		std::clamp(sphere.center.z, aabb.min.z, aabb.max.z),
+	};
+
+	if (VectorLength(closestPoint - sphere.center) <= sphere.radius) {
+
+		return true;
 
 	}
 
