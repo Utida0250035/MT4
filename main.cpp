@@ -91,7 +91,24 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 
 			ImGui::Text(("box" + std::to_string(i)).c_str());
 			ImGui::DragFloat3(("max" + std::to_string(i)).c_str(), &boxes[i].max.x, 0.03125f);
+			
+			if (ImGui::IsItemActive()) {
+
+				boxes[i].max.x = std::max(boxes[i].min.x, boxes[i].max.x);
+				boxes[i].max.y = std::max(boxes[i].min.y, boxes[i].max.y);
+				boxes[i].max.z = std::max(boxes[i].min.z, boxes[i].max.z);
+
+			}
+			
 			ImGui::DragFloat3(("min" + std::to_string(i)).c_str(), &boxes[i].min.x, 0.03125f);
+
+			if (ImGui::IsItemActive()) {
+
+				boxes[i].min.x = std::min(boxes[i].min.x, boxes[i].max.x);
+				boxes[i].min.y = std::min(boxes[i].min.y, boxes[i].max.y);
+				boxes[i].min.z = std::min(boxes[i].min.z, boxes[i].max.z);
+
+			}
 
 		}
 
