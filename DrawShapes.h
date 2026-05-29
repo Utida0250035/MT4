@@ -5,6 +5,7 @@
 #include "Sphere.h"
 #include "Plane.h"
 #include "Line.h"
+#include "AABB.h"
 #include <stdint.h>
 
 void DrawGrid(const Matrix4x4& viewProjectionMatrix, const Matrix4x4& viewportMatrix);
@@ -20,3 +21,5 @@ void DrawRay(const Ray& ray, const Matrix4x4& viewProjectionMatrix, const Matrix
 void DrawSegment(const Segment& segment, const Matrix4x4& viewProjectionMatrix, const Matrix4x4& viewportMatrix, uint32_t color);
 
 void DrawTriangle(const Triangle& triangle, const Matrix4x4& viewProjectionMatrix, const Matrix4x4& viewportMatrix, uint32_t color);
+
+void DrawAABB(const AABB& aabb, const Matrix4x4& viewProjectionMatrix, const Matrix4x4& viewportMatrix, uint32_t color);

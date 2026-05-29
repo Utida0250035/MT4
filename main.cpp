@@ -4,7 +4,7 @@
 #include "Matrix3D.h"
 #include "Sphere.h"
 #include "Line.h"
-#include "NoviceUtility.h"
+#include "AABB.h"
 #include <algorithm>
 #include <cmath>
 #include <Novice.h>
@@ -40,13 +40,19 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 	Vector3 cameraPosition{};
 	Vector3 cameraRotate{};
 
-	Triangle triangle{
-		Vector3{0.5f, 1.0f, 0.0f},
-		Vector3{1.0f, 1.0f, 0.5f},
-		Vector3{2.0f, 1.0f, 2.0f}
-	};
+	AABB boxes[2] = {
 
-	Segment segment = Segment{ Vector3{1.0f, 1.0f, 1.0f} ,Vector3{1.0f, 1.0f, 1.0f} };
+		AABB{
+			.min{-0.5f, -0.5f, -0.5f},
+			.max{0.0f, 0.0f, 0.0f}
+		},
+
+		AABB{
+			.min{0.2f, 0.2f, 0.2f},
+			.max{1.0f, 1.0f, 1.0f}
+		}
+
+	};
 
 	bool isHit = false;
 
@@ -79,26 +85,19 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 		camera->Update();
 
 
-		ImGui::Begin("segemnt");
+		ImGui::Begin("boxes");
 
-		ImGui::DragFloat3("origin", &segment.origin.x, 0.03125f);
+		for (size_t i = 0; i < 2; ++i) {
 
-		ImGui::DragFloat3("difference", &segment.difference.x, 0.03125f);
-
-		ImGui::End();
-
-
-		ImGui::Begin("triangle");
-
-		for (uint32_t i = 0; i < 3; ++i) {
-
-			ImGui::DragFloat3(std::string("vertex" + std::to_string(i)).c_str(), &triangle.vertices[i].x, 0.03125f);
+			ImGui::Text(("box" + std::to_string(i)).c_str());
+			ImGui::DragFloat3(("max" + std::to_string(i)).c_str(), &boxes[i].max.x, 0.03125f);
+			ImGui::DragFloat3(("min" + std::to_string(i)).c_str(), &boxes[i].min.x, 0.03125f);
 
 		}
 
 		ImGui::End();
 
-		isHit = IsSegmentHitTriangle(segment, triangle);
+		isHit = IsHitAABBs(boxes[0], boxes[1]);
 
 		///
 		/// ↑更新処理ここまで
@@ -118,9 +117,11 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 
 		}
 
-		DrawSegment(segment, camera->GetViewProjectionMatrix(), camera->GetViewportMatrix(), objectsColor);
+		for (const auto& box : boxes) {
 
-		DrawTriangle(triangle, camera->GetViewProjectionMatrix(), camera->GetViewportMatrix(), objectsColor);
+			DrawAABB(box, camera->GetViewProjectionMatrix(), camera->GetViewportMatrix(), objectsColor);
+
+		}
 
 		///
 		/// ↑描画処理ここまで
