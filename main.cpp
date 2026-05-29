@@ -41,13 +41,13 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 	Vector3 cameraRotate{};
 
 	AABB box{
-		.min{-0.5f, -0.5f, -0.5f},
-		.max{0.0f, 0.0f, 0.0f}
+		.min{0.0f, 0.0f, 0.0f},
+		.max{1.0f, 1.0f, 1.0f}
 	};
 
-	Sphere sphere{
-		.center{1.0f, 1.0f, 1.0f},
-		.radius = 0.5f
+	Segment segment{
+		.origin{1.0f, 1.0f, 1.0f},
+		.difference{0.0f, 1.0f, 0.0f}
 	};
 
 	bool isHit = false;
@@ -80,13 +80,15 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 
 		camera->Update();
 
-		ImGui::Begin("sphere");
 
-		ImGui::DragFloat3("center", &sphere.center.x, 0.03125f);
+		ImGui::Begin("segment");
 
-		ImGui::DragFloat("radius", &sphere.radius, 0.03125f);
+		ImGui::DragFloat3("origin", &segment.origin.x, 0.03125f);
+
+		ImGui::DragFloat3("difference", &segment.difference.x, 0.03125f);
 
 		ImGui::End();
+
 
 		ImGui::Begin("box");
 
@@ -112,7 +114,7 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 
 		ImGui::End();
 
-		isHit = IsSphereHitAABB(sphere, box);
+		isHit = IsSegmentHitAABB(segment, box);
 
 		///
 		/// ↑更新処理ここまで
@@ -124,7 +126,7 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 
 		DrawGrid(camera->GetViewProjectionMatrix(), camera->GetViewportMatrix());
 
-		uint32_t objectsColor = WHITE;
+		uint32_t objectsColor = BLACK;
 
 		if (isHit) {
 
@@ -132,7 +134,7 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 
 		}
 
-		DrawSphere(sphere, camera->GetViewProjectionMatrix(), camera->GetViewportMatrix(), objectsColor);
+		DrawSegment(segment, camera->GetViewProjectionMatrix(), camera->GetViewportMatrix(), objectsColor);
 
 		DrawAABB(box, camera->GetViewProjectionMatrix(), camera->GetViewportMatrix(), objectsColor);
 

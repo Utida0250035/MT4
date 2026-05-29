@@ -28,3 +28,11 @@ bool IsSegmentHitTriangle(const Segment& segment, const Triangle& triangle);
 bool IsHitAABBs(const AABB& box1, const AABB& box2);
 
 bool IsSphereHitAABB(const Sphere& sphere, const AABB& aabb);
+
+bool IsPointHitAABB(const Vector3& point, const AABB& aabb);
+
+bool IsLineHitAABB(const Line& segment, const AABB& aabb);
+
+bool IsRayHitAABB(const Ray& segment, const AABB& aabb);
+
+bool IsSegmentHitAABB(const Segment& segment, const AABB& aabb);

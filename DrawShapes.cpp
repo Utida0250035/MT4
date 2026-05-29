@@ -176,7 +176,7 @@ void DrawPlane(const Plane& plane, const Matrix4x4& viewProjectionMatrix, const 
 
 void DrawLine(const Line& line, const Matrix4x4& viewProjectionMatrix, const Matrix4x4& viewportMatrix, uint32_t color) {
 
-	const float virtualLength = 32.0f;
+	const float virtualLength = 1.0f;
 
 	Vector3 virtualEndPos = line.origin + VectorNormalize(line.difference) * virtualLength;
 
@@ -191,7 +191,7 @@ void DrawLine(const Line& line, const Matrix4x4& viewProjectionMatrix, const Mat
 
 void DrawRay(const Ray& ray, const Matrix4x4& viewProjectionMatrix, const Matrix4x4& viewportMatrix, uint32_t color) {
 
-	const float virtualLength = 32.0f;
+	const float virtualLength = 1.0f;
 
 	Vector3 virtualEndPos = ray.origin + VectorNormalize(ray.difference) * virtualLength;
 
