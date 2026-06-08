@@ -308,7 +308,7 @@ static bool IsGenericLineIntersectAABB(const Vector3& origin, const Vector3& dif
 	float originByArray[3] = { origin.x, origin.y, origin.z };
 	float differenceByArray[3] = { difference.x, difference.y, difference.z };
 	float boxMinByArray[3] = { aabb.min.x, aabb.min.y, aabb.min.z };
-	float boxMaxByArray[3] = { aabb.max.x, aabb.max.x, aabb.max.z };
+	float boxMaxByArray[3] = { aabb.max.x, aabb.max.y, aabb.max.z };
 
 	float t1 = 0.0f;
 	float t2 = 0.0f;
