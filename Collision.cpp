@@ -410,3 +410,22 @@ bool IsSegmentHitAABB(const Segment& segment, const AABB& aabb) {
 
 }
 
+bool IsSphereHitOBB(const Sphere& sphere, const OBB& obb, const Matrix4x4& obbObjectTransformMatrix) {
+
+	Matrix4x4 obbWorldMatrixInverse = MatrixInverse(obbObjectTransformMatrix);
+
+	Vector3 centerInObbLocal = VectorTransform(sphere.center, obbWorldMatrixInverse);
+
+	AABB aabbFromObbLocal{ .min = obb.size * -0.5f, .max = obb.size * 0.5f };
+
+	Sphere sphereFromObbLocal{ centerInObbLocal, sphere.radius };
+
+	return IsSphereHitAABB(sphereFromObbLocal, aabbFromObbLocal);
+
+}
+
+bool IsSphereHitOBB(const Sphere& sphere, const OBB& obb) {
+
+	return IsSphereHitOBB(sphere, obb, GetObbWorldMatrix(obb));
+
+}

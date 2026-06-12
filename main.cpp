@@ -1,16 +1,17 @@
-﻿#include "Camera.h"
+﻿#include "AABB.h"
+#include "Camera.h"
 #include "Collision.h"
 #include "DrawShapes.h"
-#include "Matrix3D.h"
-#include "Sphere.h"
 #include "Line.h"
-#include "AABB.h"
+#include "Matrix3D.h"
+#include "OBB.h"
+#include "Sphere.h"
 #include <algorithm>
 #include <cmath>
-#include <Novice.h>
-#include <numbers>
 #include <ImGui.h>
 #include <memory>
+#include <Novice.h>
+#include <numbers>
 #include <string>
 
 // 個人: クラス記号_出席番号_氏_名_タイトル
@@ -40,14 +41,17 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 	Vector3 cameraPosition{};
 	Vector3 cameraRotate{};
 
-	AABB box{
-		.min{0.0f, 0.0f, 0.0f},
-		.max{1.0f, 1.0f, 1.0f}
+	OBB box{
+		.center = {0.5f, 0.5f, 0.5f},
+		.axis = {{1.0f, 0.0f, 0.0f}, {0.0f, 1.0f, 0.0f}, {0.0f, 0.0f, 1.0f}},
+		.size = {1.0f, 1.0f, 1.0f},
 	};
 
-	Segment segment{
-		.origin{1.0f, 1.0f, 1.0f},
-		.difference{0.0f, 1.0f, 0.0f}
+	Vector3 boxRotate{};
+
+	Sphere sphere{
+		.center{1.0f, 1.0f, 1.0f},
+		.radius = 0.5f
 	};
 
 	bool isHit = false;
@@ -81,40 +85,32 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 		camera->Update();
 
 
-		ImGui::Begin("segment");
+		ImGui::Begin("sphere");
 
-		ImGui::DragFloat3("origin", &segment.origin.x, 0.03125f);
+		ImGui::DragFloat3("center", &sphere.center.x, 0.03125f);
 
-		ImGui::DragFloat3("difference", &segment.difference.x, 0.03125f);
+		ImGui::DragFloat("radius", &sphere.radius, 0.03125f);
 
 		ImGui::End();
 
 
 		ImGui::Begin("box");
 
-		ImGui::DragFloat3("max", &box.max.x, 0.03125f);
+		ImGui::DragFloat3("size", &box.size.x, 0.03125f);
+
+		ImGui::DragFloat3("rotate", &boxRotate.x, 0.03125f);
 
 		if (ImGui::IsItemActive()) {
 
-			box.max.x = std::max(box.min.x, box.max.x);
-			box.max.y = std::max(box.min.y, box.max.y);
-			box.max.z = std::max(box.min.z, box.max.z);
+			SetObbAxis(box, boxRotate);
 
 		}
 
-		ImGui::DragFloat3("min", &box.min.x, 0.03125f);
-
-		if (ImGui::IsItemActive()) {
-
-			box.min.x = std::min(box.min.x, box.max.x);
-			box.min.y = std::min(box.min.y, box.max.y);
-			box.min.z = std::min(box.min.z, box.max.z);
-
-		}
+		ImGui::DragFloat3("translate", &box.center.x, 0.03125f);
 
 		ImGui::End();
 
-		isHit = IsSegmentHitAABB(segment, box);
+		isHit = IsSphereHitOBB(sphere, box);
 
 		///
 		/// ↑更新処理ここまで
@@ -134,9 +130,9 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 
 		}
 
-		DrawSegment(segment, camera->GetViewProjectionMatrix(), camera->GetViewportMatrix(), objectsColor);
+		DrawSphere(sphere, camera->GetViewProjectionMatrix(), camera->GetViewportMatrix(), objectsColor);
 
-		DrawAABB(box, camera->GetViewProjectionMatrix(), camera->GetViewportMatrix(), objectsColor);
+		DrawOBB(box, camera->GetViewProjectionMatrix(), camera->GetViewportMatrix(), objectsColor);
 
 		///
 		/// ↑描画処理ここまで

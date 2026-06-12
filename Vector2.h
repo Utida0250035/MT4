@@ -60,6 +60,12 @@ inline Vector2 operator-(const Vector2& me, const Vector2& other) {
 
 }
 
+inline Vector2 operator-(const Vector2& me) {
+
+	return { -me.x, -me.y};
+
+}
+
 inline void operator-=(Vector2& me, const Vector2& other) {
 
 	me.x -= other.x;

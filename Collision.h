@@ -1,10 +1,11 @@
 ﻿#pragma once
 
-#include "Sphere.h"
-#include "Plane.h"
-#include "Line.h"
-#include "Triangle.h"
 #include "AABB.h"
+#include "Line.h"
+#include "OBB.h"
+#include "Plane.h"
+#include "Sphere.h"
+#include "Triangle.h"
 
 bool IsHitSpheres(const Sphere& sphere1, const Sphere& sphere2);
 
@@ -36,3 +37,7 @@ bool IsLineHitAABB(const Line& segment, const AABB& aabb);
 bool IsRayHitAABB(const Ray& segment, const AABB& aabb);
 
 bool IsSegmentHitAABB(const Segment& segment, const AABB& aabb);
+
+bool IsSphereHitOBB(const Sphere& sphere, const OBB& obb, const Matrix4x4& obbObjectTransformMatrix);
+
+bool IsSphereHitOBB(const Sphere& sphere, const OBB& obb);

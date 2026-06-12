@@ -3,7 +3,7 @@
 #include <cmath>
 #include <Novice.h>
 
-Matrix4x4 Inverse(const Matrix4x4& matrix) {
+Matrix4x4 MatrixInverse(const Matrix4x4& matrix) {
 
 	Matrix4x4 res;
 
@@ -48,14 +48,38 @@ Matrix4x4 Inverse(const Matrix4x4& matrix) {
 	res.m[2][3] = -Determinant3x3(matrix.m[0][0], matrix.m[0][1], matrix.m[0][3], matrix.m[1][0], matrix.m[1][1], matrix.m[1][3], matrix.m[2][0], matrix.m[2][1], matrix.m[2][3]);
 	res.m[3][3] = Determinant3x3(matrix.m[0][0], matrix.m[0][1], matrix.m[0][2], matrix.m[1][0], matrix.m[1][1], matrix.m[1][2], matrix.m[2][0], matrix.m[2][1], matrix.m[2][2]);
 
-	// 最後に一括で invDet を掛ける
-	for (int i = 0; i < 4; i++) {
-		for (int j = 0; j < 4; j++) {
-			res.m[i][j] *= invDet;
-		}
-	}
+	// 最後にスカラー(invDet)倍
+	res *= invDet;
 
 	return res;
+
+}
+
+Matrix4x4 RTMatrixInverse(const Matrix4x4& rotateMatrix, const Matrix4x4& translateMatrix) {
+
+	Matrix4x4 result = MakeIdentity4x4();
+
+	Matrix4x4 rotateMatrixT = MatrixTranspose(rotateMatrix);
+
+	Vector3 translate = { translateMatrix.m[3][0],translateMatrix.m[3][1],translateMatrix.m[3][2] };
+
+	Vector3 translateConvert = VectorTransform(-1.0f * translate, rotateMatrixT);
+
+	float translateByArray[] = { translateConvert.x, translateConvert.y, translateConvert.z };
+
+	for (size_t i = 0; i < 3; ++i) {
+
+		result.m[3][i] = translateByArray[i];
+
+		for (size_t j = 0; j < 3; ++j) {
+
+			result.m[i][j] = rotateMatrixT.m[i][j];
+
+		}
+
+	}
+
+	return result;
 
 }
 
