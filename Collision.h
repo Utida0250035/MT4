@@ -47,3 +47,5 @@ bool IsLineHitOBB(const Line& line, const OBB& obb);
 bool IsRayHitOBB(const Ray& ray, const OBB& obb);
 
 bool IsSegmentHitOBB(const Segment& segment, const OBB& obb);
+
+bool IsObbHitObb(const OBB& obb1, const OBB& obb2);

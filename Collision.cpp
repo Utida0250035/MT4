@@ -1,7 +1,11 @@
 ﻿#include "Collision.h"
+#include "Vector3.h"
 #include <cmath>
 #include <algorithm>
 #include <limits>
+#include <array>
+#include <vector>
+#include <ranges>
 
 bool IsHitSpheres(const Sphere& sphere1, const Sphere& sphere2) {
 
@@ -486,5 +490,105 @@ bool IsSegmentHitOBB(const Segment& segment, const OBB& obb) {
 	Segment localSegment{ localOrigin, localDifference };
 
 	return IsSegmentHitAABB(localSegment, localAABB);
+
+}
+
+static std::array<Vector3, 8> GetObbVertices(const OBB& obb) {
+
+	uint32_t isPlus = 0;
+
+	std::array<Vector3, 8> obbVertices{};
+
+	float obbSizeByArray[3]{
+		obb.size.x,
+		obb.size.y,
+		obb.size.z
+	};
+
+	// [0](2進000)から[7](2進111)の頂点8パターンを自動出力
+	// 真理値表アルゴリズムの応用
+	for (uint32_t i = 0; i < 8; ++i) {
+
+		obbVertices[i] = obb.center;
+
+		for (uint32_t j = 0; j < 3; ++j) {
+			// X,Y,Z各軸の判定を行う
+			// 中心から軸の正負どちらに向かうか
+
+			isPlus = (i >> j) & 1;
+
+			if (isPlus) {
+
+				obbVertices[i] += obb.axis[j] * obbSizeByArray[j] * 0.5f;
+
+			} else {
+
+				obbVertices[i] += obb.axis[j] * obbSizeByArray[j] * -0.5f;
+
+			}
+
+		}
+
+	}
+
+	return obbVertices;
+
+}
+
+bool IsObbHitObb(const OBB& obb1, const OBB& obb2) {
+
+	Vector3 separateAxis[15]{};
+
+	for (size_t i = 0; i < 3; ++i) {
+
+		separateAxis[i * 2] = obb1.axis[i];
+		separateAxis[i * 2 + 1] = obb2.axis[i];
+
+		for (size_t j = 0; j < 3; ++j) {
+
+			separateAxis[i * 3 + j + 6] = VectorCross(obb1.axis[i], obb2.axis[j]);
+
+		}
+
+	}
+
+	std::array<std::array<Vector3, 8>, 2> obbVertices = { GetObbVertices(obb1), GetObbVertices(obb2) };
+
+	float min[2] = { VectorDot(obbVertices[0][0], separateAxis[0]),  VectorDot(obbVertices[1][0], separateAxis[0]) };
+	float max[2] = { min[0], min[1] };
+
+	float dot;
+
+	for (size_t i = 0; i < 15; ++i) {
+
+		for (size_t j = 0; j < 8; j++) {
+
+			for (size_t k = 0; k < 2; ++k) {
+
+				dot = VectorDot(obbVertices[k][j], separateAxis[i]);
+
+				if (dot < min[k]) {
+
+					min[k] = dot;
+
+				} else if (dot > max[k]) {
+
+					max[k] = dot;
+
+				}
+
+			}
+
+		}
+
+		if (max[0] < min[1] || max[1] < min[0]) {
+
+			return false;
+
+		}
+
+	}
+
+	return true;
 
 }
