@@ -429,3 +429,62 @@ bool IsSphereHitOBB(const Sphere& sphere, const OBB& obb) {
 	return IsSphereHitOBB(sphere, obb, GetObbWorldMatrix(obb));
 
 }
+
+static void TransformObbLocal(const Vector3& origin, const Vector3& difference, const OBB& obb, Vector3& localOrigin, Vector3& localDifference, AABB& localAABB) {
+
+	Matrix4x4 obbWorldMatrixInverse = MatrixInverse(GetObbWorldMatrix(obb));
+
+	localOrigin = VectorTransform(origin, obbWorldMatrixInverse);
+
+	Vector3 localEnd = VectorTransform(origin + difference, obbWorldMatrixInverse);
+
+	localDifference = localEnd - localOrigin;
+
+	localAABB = {
+		.min = -obb.size * 0.5f,
+		.max = obb.size * 0.5f
+	};
+
+}
+
+bool IsLineHitOBB(const Line& line, const OBB& obb) {
+
+	Vector3 localOrigin{};
+	Vector3 localDifference{};
+	AABB localAABB{};
+
+	TransformObbLocal(line.origin, line.difference, obb, localOrigin, localDifference, localAABB);
+
+	Line localLine{ localOrigin, localDifference };
+
+	return IsLineHitAABB(localLine, localAABB);
+
+}
+
+bool IsRayHitOBB(const Ray& ray, const OBB& obb) {
+
+	Vector3 localOrigin{};
+	Vector3 localDifference{};
+	AABB localAABB{};
+
+	TransformObbLocal(ray.origin, ray.difference, obb, localOrigin, localDifference, localAABB);
+
+	Ray localRay{ localOrigin, localDifference };
+
+	return IsRayHitAABB(localRay, localAABB);
+
+}
+
+bool IsSegmentHitOBB(const Segment& segment, const OBB& obb) {
+
+	Vector3 localOrigin{};
+	Vector3 localDifference{};
+	AABB localAABB{};
+
+	TransformObbLocal(segment.origin, segment.difference, obb, localOrigin, localDifference, localAABB);
+
+	Segment localSegment{ localOrigin, localDifference };
+
+	return IsSegmentHitAABB(localSegment, localAABB);
+
+}

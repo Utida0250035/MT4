@@ -41,3 +41,9 @@ bool IsSegmentHitAABB(const Segment& segment, const AABB& aabb);
 bool IsSphereHitOBB(const Sphere& sphere, const OBB& obb, const Matrix4x4& obbObjectTransformMatrix);
 
 bool IsSphereHitOBB(const Sphere& sphere, const OBB& obb);
+
+bool IsLineHitOBB(const Line& line, const OBB& obb);
+
+bool IsRayHitOBB(const Ray& ray, const OBB& obb);
+
+bool IsSegmentHitOBB(const Segment& segment, const OBB& obb);
