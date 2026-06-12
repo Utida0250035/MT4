@@ -103,19 +103,49 @@ inline constexpr void operator*=(Matrix4x4& me, const Matrix4x4& other) {
 
 }
 
-inline Matrix4x4 Add(const Matrix4x4& me, const Matrix4x4& other) {
+inline constexpr Matrix4x4 operator*(const float scalar, const Matrix4x4& matrix) {
+
+	Matrix4x4 result{};
+
+	for (size_t i = 0; i < 4; ++i) {
+
+		for (size_t j = 0; j < 4; ++j) {
+
+			result.m[i][j] = matrix.m[i][j] * scalar;
+
+		}
+
+	}
+
+	return result;
+
+}
+
+inline constexpr Matrix4x4 operator*(const Matrix4x4& matrix, const float scalar) {
+
+	return scalar * matrix;
+
+}
+
+inline constexpr void operator*=(Matrix4x4& matrix, const float scalar) {
+
+	matrix = scalar * matrix;
+
+}
+
+inline constexpr Matrix4x4 Add(const Matrix4x4& me, const Matrix4x4& other) {
 
 	return me + other;
 
 }
 
-inline Matrix4x4 Subtract(const Matrix4x4& me, const Matrix4x4& other) {
+inline constexpr Matrix4x4 Subtract(const Matrix4x4& me, const Matrix4x4& other) {
 
 	return me - other;
 
 }
 
-inline Matrix4x4 Multiply(const Matrix4x4& me, const Matrix4x4& other) {
+inline constexpr Matrix4x4 Multiply(const Matrix4x4& me, const Matrix4x4& other) {
 
 	return me * other;
 
@@ -146,9 +176,11 @@ inline constexpr float Determinant3x3(
 
 }
 
-Matrix4x4 Inverse(const Matrix4x4& matrix);
+Matrix4x4 MatrixInverse(const Matrix4x4& matrix);
 
-inline constexpr Matrix4x4 Transpose(const Matrix4x4 matrix) {
+Matrix4x4 RTMatrixInverse(const Matrix4x4& roteteMatrix, const Matrix4x4& translateMatrix);
+
+inline constexpr Matrix4x4 MatrixTranspose(const Matrix4x4 matrix) {
 
 	Matrix4x4 result = {};
 
@@ -206,7 +238,7 @@ inline constexpr Matrix4x4 MakeTranslateMatrix(const Vector3& translate) {
 
 }
 
-inline constexpr Vector3 Transform(const Vector3& vector, const Matrix4x4& matrix) {
+inline constexpr Vector3 VectorTransform(const Vector3& vector, const Matrix4x4& matrix) {
 
 	Vector3 result{};
 
@@ -225,7 +257,7 @@ inline constexpr Vector3 Transform(const Vector3& vector, const Matrix4x4& matri
 
 inline constexpr Vector3 ScreenTransform(const Vector3& vector, const Matrix4x4& viewProjectionMatrix, const Matrix4x4& viewportMatrix) {
 
-	return Transform(Transform(vector, viewProjectionMatrix), viewportMatrix);
+	return VectorTransform(VectorTransform(vector, viewProjectionMatrix), viewportMatrix);
 
 }
 

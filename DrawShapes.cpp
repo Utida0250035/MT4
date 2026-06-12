@@ -20,11 +20,11 @@ void DrawGrid(const Matrix4x4& viewProjectionMatrix, const Matrix4x4& viewportMa
 		Matrix4x4 lineStartWorldMatrix = MakeWorldMatrix(lineStartPosWorld);
 		Matrix4x4 lineEndWorldMatrix = MakeWorldMatrix(lineEndPosWorld);
 
-		Vector3 lineStartPosNdc = Transform(Vector3{}, lineStartWorldMatrix * viewProjectionMatrix);
-		Vector3 lineEndPosNdc = Transform(Vector3{}, lineEndWorldMatrix * viewProjectionMatrix);
+		Vector3 lineStartPosNdc = VectorTransform(Vector3{}, lineStartWorldMatrix * viewProjectionMatrix);
+		Vector3 lineEndPosNdc = VectorTransform(Vector3{}, lineEndWorldMatrix * viewProjectionMatrix);
 
-		Vector3 lineStartPosScreen = Transform(lineStartPosNdc, viewportMatrix);
-		Vector3 lineEndPosScreen = Transform(lineEndPosNdc, viewportMatrix);
+		Vector3 lineStartPosScreen = VectorTransform(lineStartPosNdc, viewportMatrix);
+		Vector3 lineEndPosScreen = VectorTransform(lineEndPosNdc, viewportMatrix);
 
 		NoviceUtility::DrawLine(
 			lineStartPosScreen, lineEndPosScreen, 0xAAAAAAFF
@@ -41,11 +41,11 @@ void DrawGrid(const Matrix4x4& viewProjectionMatrix, const Matrix4x4& viewportMa
 		Matrix4x4 lineStartWorldMatrix = MakeWorldMatrix(lineStartPosWorld);
 		Matrix4x4 lineEndWorldMatrix = MakeWorldMatrix(lineEndPosWorld);
 
-		Vector3 lineStartPosNdc = Transform(Vector3{}, lineStartWorldMatrix * viewProjectionMatrix);
-		Vector3 lineEndPosNdc = Transform(Vector3{}, lineEndWorldMatrix * viewProjectionMatrix);
+		Vector3 lineStartPosNdc = VectorTransform(Vector3{}, lineStartWorldMatrix * viewProjectionMatrix);
+		Vector3 lineEndPosNdc = VectorTransform(Vector3{}, lineEndWorldMatrix * viewProjectionMatrix);
 
-		Vector3 lineStartPosScreen = Transform(lineStartPosNdc, viewportMatrix);
-		Vector3 lineEndPosScreen = Transform(lineEndPosNdc, viewportMatrix);
+		Vector3 lineStartPosScreen = VectorTransform(lineStartPosNdc, viewportMatrix);
+		Vector3 lineEndPosScreen = VectorTransform(lineEndPosNdc, viewportMatrix);
 
 		NoviceUtility::DrawLine(
 			lineStartPosScreen, lineEndPosScreen, 0xAAAAAAFF
@@ -60,11 +60,11 @@ void DrawGrid(const Matrix4x4& viewProjectionMatrix, const Matrix4x4& viewportMa
 	Matrix4x4 xLineStartWorldMatrix = MakeWorldMatrix(xLineStartPosWorld);
 	Matrix4x4 xLineEndWorldMatrix = MakeWorldMatrix(xLineEndPosWorld);
 
-	Vector3 xLineStartPosNdc = Transform(Vector3{}, xLineStartWorldMatrix * viewProjectionMatrix);
-	Vector3 xLineEndPosNdc = Transform(Vector3{}, xLineEndWorldMatrix * viewProjectionMatrix);
+	Vector3 xLineStartPosNdc = VectorTransform(Vector3{}, xLineStartWorldMatrix * viewProjectionMatrix);
+	Vector3 xLineEndPosNdc = VectorTransform(Vector3{}, xLineEndWorldMatrix * viewProjectionMatrix);
 
-	Vector3 xLineStartPosScreen = Transform(xLineStartPosNdc, viewportMatrix);
-	Vector3 xLineEndPosScreen = Transform(xLineEndPosNdc, viewportMatrix);
+	Vector3 xLineStartPosScreen = VectorTransform(xLineStartPosNdc, viewportMatrix);
+	Vector3 xLineEndPosScreen = VectorTransform(xLineEndPosNdc, viewportMatrix);
 
 	NoviceUtility::DrawLine(
 		xLineStartPosScreen, xLineEndPosScreen, 0x000000FF
@@ -77,11 +77,11 @@ void DrawGrid(const Matrix4x4& viewProjectionMatrix, const Matrix4x4& viewportMa
 	Matrix4x4 zLineStartWorldMatrix = MakeWorldMatrix(zLineStartPosWorld);
 	Matrix4x4 zLineEndWorldMatrix = MakeWorldMatrix(zLineEndPosWorld);
 
-	Vector3 zLineStartPosNdc = Transform(Vector3{}, zLineStartWorldMatrix * viewProjectionMatrix);
-	Vector3 zLineEndPosNdc = Transform(Vector3{}, zLineEndWorldMatrix * viewProjectionMatrix);
+	Vector3 zLineStartPosNdc = VectorTransform(Vector3{}, zLineStartWorldMatrix * viewProjectionMatrix);
+	Vector3 zLineEndPosNdc = VectorTransform(Vector3{}, zLineEndWorldMatrix * viewProjectionMatrix);
 
-	Vector3 zLineStartPosScreen = Transform(zLineStartPosNdc, viewportMatrix);
-	Vector3 zLineEndPosScreen = Transform(zLineEndPosNdc, viewportMatrix);
+	Vector3 zLineStartPosScreen = VectorTransform(zLineStartPosNdc, viewportMatrix);
+	Vector3 zLineEndPosScreen = VectorTransform(zLineEndPosNdc, viewportMatrix);
 
 	NoviceUtility::DrawLine(
 		zLineStartPosScreen, zLineEndPosScreen, 0x000000FF
@@ -113,21 +113,21 @@ void DrawSphere(const Sphere& sphere, const Matrix4x4& viewProjectionMatrix, con
 
 			cPosLocal = Vector3{ cos(lat) * cos(lon + kLonEvery), sin(lat), cos(lat) * sin(lon + kLonEvery) } * sphere.radius;
 
-			Vector3 lineABStartPosNdc = Transform(aPosLocal, worldViewProjectionMatrix);
-			Vector3 lineABEndPosNdc = Transform(bPosLocal, worldViewProjectionMatrix);
+			Vector3 lineABStartPosNdc = VectorTransform(aPosLocal, worldViewProjectionMatrix);
+			Vector3 lineABEndPosNdc = VectorTransform(bPosLocal, worldViewProjectionMatrix);
 
-			Vector3 lineABStartPosScreen = Transform(lineABStartPosNdc, viewportMatrix);
-			Vector3 lineABEndPosScreen = Transform(lineABEndPosNdc, viewportMatrix);
+			Vector3 lineABStartPosScreen = VectorTransform(lineABStartPosNdc, viewportMatrix);
+			Vector3 lineABEndPosScreen = VectorTransform(lineABEndPosNdc, viewportMatrix);
 
 			NoviceUtility::DrawLine(
 				lineABStartPosScreen, lineABEndPosScreen, color
 			);
 
-			Vector3 lineACStartPosNdc = Transform(aPosLocal, worldViewProjectionMatrix);
-			Vector3 lineACEndPosNdc = Transform(cPosLocal, worldViewProjectionMatrix);
+			Vector3 lineACStartPosNdc = VectorTransform(aPosLocal, worldViewProjectionMatrix);
+			Vector3 lineACEndPosNdc = VectorTransform(cPosLocal, worldViewProjectionMatrix);
 
-			Vector3 lineACStartPosScreen = Transform(lineACStartPosNdc, viewportMatrix);
-			Vector3 lineACEndPosScreen = Transform(lineACEndPosNdc, viewportMatrix);
+			Vector3 lineACStartPosScreen = VectorTransform(lineACStartPosNdc, viewportMatrix);
+			Vector3 lineACEndPosScreen = VectorTransform(lineACEndPosNdc, viewportMatrix);
 
 			NoviceUtility::DrawLine(
 				lineACStartPosScreen, lineACEndPosScreen, color
@@ -280,6 +280,47 @@ void DrawAABB(const AABB& aabb, const Matrix4x4& viewProjectionMatrix, const Mat
 	NoviceUtility::DrawLine(verticesScreen[5], verticesScreen[6], color);
 	NoviceUtility::DrawLine(verticesScreen[6], verticesScreen[7], color);
 	NoviceUtility::DrawLine(verticesScreen[7], verticesScreen[4], color);
+	NoviceUtility::DrawLine(verticesScreen[0], verticesScreen[4], color);
+	NoviceUtility::DrawLine(verticesScreen[1], verticesScreen[5], color);
+	NoviceUtility::DrawLine(verticesScreen[2], verticesScreen[6], color);
+	NoviceUtility::DrawLine(verticesScreen[3], verticesScreen[7], color);
+
+}
+
+void DrawOBB(const OBB& obb, const Matrix4x4& viewProjectionMatrix, const Matrix4x4& viewportMatrix, uint32_t color) {
+
+	Vector3 scaledAxis[3] = { obb.axis[0] * obb.size.x * 0.5f, obb.axis[1] * obb.size.y * 0.5f, obb.axis[2] * obb.size.z * 0.5f };
+
+	Vector3 verticesScreen[8] = {
+		// 右上奥
+		ScreenTransform(obb.center + scaledAxis[0] + scaledAxis[1] + scaledAxis[2], viewProjectionMatrix, viewportMatrix),
+		// 左上奥
+		ScreenTransform(obb.center - scaledAxis[0] + scaledAxis[1] + scaledAxis[2], viewProjectionMatrix, viewportMatrix),
+		// 左上手前
+		ScreenTransform(obb.center - scaledAxis[0] + scaledAxis[1] - scaledAxis[2], viewProjectionMatrix, viewportMatrix),
+		// 右上手前
+		ScreenTransform(obb.center + scaledAxis[0] + scaledAxis[1] - scaledAxis[2], viewProjectionMatrix, viewportMatrix),
+
+		// 右下奥
+		ScreenTransform(obb.center + scaledAxis[0] - scaledAxis[1] + scaledAxis[2], viewProjectionMatrix, viewportMatrix),
+		// 左下奥
+		ScreenTransform(obb.center - scaledAxis[0] - scaledAxis[1] + scaledAxis[2], viewProjectionMatrix, viewportMatrix),
+		// 左下手前
+		ScreenTransform(obb.center - scaledAxis[0] - scaledAxis[1] - scaledAxis[2], viewProjectionMatrix, viewportMatrix),
+		// 右下手前
+		ScreenTransform(obb.center + scaledAxis[0] - scaledAxis[1] - scaledAxis[2], viewProjectionMatrix, viewportMatrix),
+	};
+
+	NoviceUtility::DrawLine(verticesScreen[0], verticesScreen[1], color);
+	NoviceUtility::DrawLine(verticesScreen[1], verticesScreen[2], color);
+	NoviceUtility::DrawLine(verticesScreen[2], verticesScreen[3], color);
+	NoviceUtility::DrawLine(verticesScreen[3], verticesScreen[0], color);
+
+	NoviceUtility::DrawLine(verticesScreen[4], verticesScreen[5], color);
+	NoviceUtility::DrawLine(verticesScreen[5], verticesScreen[6], color);
+	NoviceUtility::DrawLine(verticesScreen[6], verticesScreen[7], color);
+	NoviceUtility::DrawLine(verticesScreen[7], verticesScreen[4], color);
+
 	NoviceUtility::DrawLine(verticesScreen[0], verticesScreen[4], color);
 	NoviceUtility::DrawLine(verticesScreen[1], verticesScreen[5], color);
 	NoviceUtility::DrawLine(verticesScreen[2], verticesScreen[6], color);

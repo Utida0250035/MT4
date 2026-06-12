@@ -1,11 +1,12 @@
 ﻿#pragma once
 
-#include "Matrix3D.h"
-#include "Triangle.h"
-#include "Sphere.h"
-#include "Plane.h"
-#include "Line.h"
 #include "AABB.h"
+#include "Line.h"
+#include "Matrix3D.h"
+#include "OBB.h"
+#include "Plane.h"
+#include "Sphere.h"
+#include "Triangle.h"
 #include <stdint.h>
 
 void DrawGrid(const Matrix4x4& viewProjectionMatrix, const Matrix4x4& viewportMatrix);
@@ -23,3 +24,5 @@ void DrawSegment(const Segment& segment, const Matrix4x4& viewProjectionMatrix, 
 void DrawTriangle(const Triangle& triangle, const Matrix4x4& viewProjectionMatrix, const Matrix4x4& viewportMatrix, uint32_t color);
 
 void DrawAABB(const AABB& aabb, const Matrix4x4& viewProjectionMatrix, const Matrix4x4& viewportMatrix, uint32_t color);
+
+void DrawOBB(const OBB& obb, const Matrix4x4& viewProjectionMatrix, const Matrix4x4& viewportMatrix, uint32_t color);

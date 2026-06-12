@@ -30,6 +30,12 @@ inline constexpr Vector3 operator-(const Vector3& me, const Vector3& other) {
 
 }
 
+inline constexpr Vector3 operator-(const Vector3& me) {
+
+	return Vector3{ -me.x, -me.y, -me.z};
+
+}
+
 inline constexpr void operator*=(Vector3& vector, const float& scalar) {
 	vector.x *= scalar;
 	vector.y *= scalar;
