@@ -151,5 +151,6 @@
     <ClInclude Include="OBB.h" />
     <ClInclude Include="Bezier.h" />
     <ClInclude Include="CatmullRom.h" />
+    <ClInclude Include="Transform.h" />
   </ItemGroup>
 </Project>

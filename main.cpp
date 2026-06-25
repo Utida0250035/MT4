@@ -1,13 +1,14 @@
 ﻿#include "AABB.h"
 #include "Bezier.h"
+#include "NoviceUtility.h"
 #include "Camera.h"
-#include "Bezier.h"
 #include "Collision.h"
 #include "DrawShapes.h"
 #include "Line.h"
 #include "Matrix3D.h"
 #include "OBB.h"
 #include "Sphere.h"
+#include "Transform.h"
 #include <algorithm>
 #include <cmath>
 #include <ImGui.h>
@@ -43,13 +44,8 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 	Vector3 cameraPosition{};
 	Vector3 cameraRotate{};
 
-	Bezier2 bezier{};
-
-	bezier.p[0] = { -1.0f, 1.0f, 1.0f };
-
-	bezier.p[1] = { 1.0f, 1.0f, 1.0f };
-
-	bezier.p[2] = { 0.5f, 0.5f, 0.5f };
+	Transform transforms[3]{};
+	Matrix4x4 worldMatrixs[3]{};
 
 	bool isHit = false;
 
@@ -79,17 +75,42 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 
 		ImGui::End();
 
-		ImGui::Begin("Bezier");
+
+		ImGui::Begin("transforms");
 
 		const char* text[3] = {
-			"p0", "p1", "p2"
+			"transform0",
+			"transform1",
+			"transform2"
 		};
+
+		Matrix4x4 bufferMatrix = MakeIdentity4x4();
+
+		std::string bufferStr{};
 
 		for (size_t i = 0; i < 3; i++) {
 
-			ImGui::DragFloat3(text[i], &bezier.p[i].x, 0.03125f);
+			ImGui::Text(text[i]);
+
+			bufferStr = "scale" + std::to_string(i);
+
+			ImGui::DragFloat3(bufferStr.c_str(), &transforms[i].scale.x, 0.03125f);
+
+			bufferStr = "rotate" + std::to_string(i);
+
+			ImGui::DragFloat3(bufferStr.c_str(), &transforms[i].rotate.x, 0.03125f);
+
+			bufferStr = "translate" + std::to_string(i);
+
+			ImGui::DragFloat3(bufferStr.c_str(), &transforms[i].translate.x, 0.03125f);
+
+			worldMatrixs[i] = MakeWorldMatrix(transforms[i]) * bufferMatrix;
+
+			bufferMatrix = worldMatrixs[i];
 
 		}
+
+		ImGui::End();
 
 		camera->Update();
 
@@ -111,7 +132,33 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 
 		}
 
-		DrawBezier2(bezier, 32, camera->GetViewProjectionMatrix(), camera->GetViewportMatrix(), objectsColor);
+		const uint32_t colors[3] = {
+			RED, GREEN, BLUE
+		};
+
+		for (size_t i = 0; i < 3; i++) {
+
+			const auto& mat = worldMatrixs[i].m;
+
+			DrawSphere(Sphere{ Vector3{mat[3][0], mat[3][1], mat[3][2]}, 0.1f }, camera->GetViewProjectionMatrix(), camera->GetViewportMatrix(), colors[i]);
+
+		}
+
+		Vector3 screenPos0{};
+		Vector3 screenPos1{};
+
+		for (size_t i = 1; i < 3; i++) {
+
+			const auto& mat0 = worldMatrixs[i - 1].m;
+			const auto& mat1 = worldMatrixs[i].m;
+
+			screenPos0 = ScreenTransform(Vector3{ mat0[3][0], mat0[3][1], mat0[3][2] }, camera->GetViewProjectionMatrix(), camera->GetViewportMatrix());
+
+			screenPos1 = ScreenTransform(Vector3{ mat1[3][0], mat1[3][1], mat1[3][2] }, camera->GetViewProjectionMatrix(), camera->GetViewportMatrix());
+
+			NoviceUtility::DrawLine(screenPos0, screenPos1, WHITE);
+
+		}
 
 		///
 		/// ↑描画処理ここまで
