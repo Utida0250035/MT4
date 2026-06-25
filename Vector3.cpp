@@ -4,7 +4,7 @@
 #include <algorithm>
 
 float VectorLength(const Vector3& vector) {
-	
+
 	return std::sqrtf(VectorLengthSquare(vector));
 
 }
@@ -37,5 +37,11 @@ Vector3 PerpendicularAny(const Vector3& vector) {
 	}
 
 	return { 0.0f, -vector.x, vector.y };
+
+}
+
+Vector3 Lerp(const Vector3& from, const Vector3& to, const float t) {
+
+	return { std::lerp(from.x, to.x, t), std::lerp(from.y, to.y, t), std::lerp(from.z, to.z, t) };
 
 }

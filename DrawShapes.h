@@ -7,6 +7,8 @@
 #include "Plane.h"
 #include "Sphere.h"
 #include "Triangle.h"
+#include "Bezier.h"
+#include "CatmullRom.h"
 #include <stdint.h>
 
 void DrawGrid(const Matrix4x4& viewProjectionMatrix, const Matrix4x4& viewportMatrix);
@@ -26,3 +28,7 @@ void DrawTriangle(const Triangle& triangle, const Matrix4x4& viewProjectionMatri
 void DrawAABB(const AABB& aabb, const Matrix4x4& viewProjectionMatrix, const Matrix4x4& viewportMatrix, uint32_t color);
 
 void DrawOBB(const OBB& obb, const Matrix4x4& viewProjectionMatrix, const Matrix4x4& viewportMatrix, uint32_t color);
+
+void DrawBezier2(const Bezier2& bezier, const uint32_t division, const Matrix4x4& viewProjectionMatrix, const Matrix4x4& viewportMatrix, uint32_t color);
+
+void DrawCatmullRom3(const CatmullRom3& spline, const uint32_t division, const Matrix4x4& viewProjectionMatrix, const Matrix4x4& viewportMatrix, uint32_t color);
