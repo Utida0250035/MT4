@@ -149,5 +149,7 @@
     <ClInclude Include="Triangle.h" />
     <ClInclude Include="AABB.h" />
     <ClInclude Include="OBB.h" />
+    <ClInclude Include="Bezier.h" />
+    <ClInclude Include="CatmullRom.h" />
   </ItemGroup>
 </Project>

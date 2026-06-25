@@ -1,5 +1,7 @@
 ﻿#include "AABB.h"
+#include "Bezier.h"
 #include "Camera.h"
+#include "Bezier.h"
 #include "Collision.h"
 #include "DrawShapes.h"
 #include "Line.h"
@@ -41,21 +43,13 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 	Vector3 cameraPosition{};
 	Vector3 cameraRotate{};
 
-	OBB boxes[2]{
-		{
-			.center = {0.5f, 0.5f, 0.5f},
-			.axis = {{1.0f, 0.0f, 0.0f}, {0.0f, 1.0f, 0.0f}, {0.0f, 0.0f, 1.0f}},
-			.size = {1.0f, 1.0f, 1.0f}
-		},
-		{
-			.center = {1.0f, 1.0f, 1.0f},
-			.axis = {{1.0f, 0.0f, 0.0f}, {0.0f, 1.0f, 0.0f}, {0.0f, 0.0f, 1.0f}},
-			.size = {1.0f, 1.0f, 1.0f}
-		},
+	Bezier2 bezier{};
 
-	};
+	bezier.p[0] = { -1.0f, 1.0f, 1.0f };
 
-	Vector3 boxRotate[2]{};
+	bezier.p[1] = { 1.0f, 1.0f, 1.0f };
+
+	bezier.p[2] = { 0.5f, 0.5f, 0.5f };
 
 	bool isHit = false;
 
@@ -85,35 +79,19 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 
 		ImGui::End();
 
-		camera->Update();
+		ImGui::Begin("Bezier");
 
-
-		const char* windowTitlesBox[2] = {
-			"box0",
-			"box2"
+		const char* text[3] = {
+			"p0", "p1", "p2"
 		};
 
-		for (size_t i = 0; i < 2; ++i) {
+		for (size_t i = 0; i < 3; i++) {
 
-			ImGui::Begin(windowTitlesBox[i]);
-
-			ImGui::DragFloat3("size", &boxes[i].size.x, 0.03125f);
-
-			ImGui::DragFloat3("rotate", &boxRotate[i].x, 0.03125f);
-
-			if (ImGui::IsItemActive()) {
-
-				SetObbAxis(boxes[i], boxRotate[i]);
-
-			}
-
-			ImGui::DragFloat3("translate", &boxes[i].center.x, 0.03125f);
-
-			ImGui::End();
+			ImGui::DragFloat3(text[i], &bezier.p[i].x, 0.03125f);
 
 		}
 
-		isHit = IsObbHitObb(boxes[0], boxes[1]);
+		camera->Update();
 
 		///
 		/// ↑更新処理ここまで
@@ -133,11 +111,7 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 
 		}
 
-		for (const auto& box : boxes) {
-
-			DrawOBB(box, camera->GetViewProjectionMatrix(), camera->GetViewportMatrix(), objectsColor);
-
-		}
+		DrawBezier2(bezier, 32, camera->GetViewProjectionMatrix(), camera->GetViewportMatrix(), objectsColor);
 
 		///
 		/// ↑描画処理ここまで

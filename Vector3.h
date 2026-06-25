@@ -115,3 +115,5 @@ static constexpr int kVectorPrintRowHeight = 20;
 void VectorScreenPrintf(int x, int y, const Vector3& vector, const char* label);
 
 Vector3 PerpendicularAny(const Vector3& vector);
+
+Vector3 Lerp(const Vector3& from, const Vector3& to, const float t);

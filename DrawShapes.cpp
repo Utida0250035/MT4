@@ -261,7 +261,7 @@ void DrawAABB(const AABB& aabb, const Matrix4x4& viewProjectionMatrix, const Mat
 		ScreenTransform(Vector3{aabb.min.x, aabb.max.y, aabb.min.z}, viewProjectionMatrix, viewportMatrix),
 		// 右上手前
 		ScreenTransform(Vector3{aabb.max.x, aabb.max.y, aabb.min.z}, viewProjectionMatrix, viewportMatrix),
-		
+
 		// 右下奥
 		ScreenTransform(Vector3{aabb.max.x, aabb.min.y, aabb.max.z}, viewProjectionMatrix, viewportMatrix),
 		// 左下奥
@@ -325,5 +325,104 @@ void DrawOBB(const OBB& obb, const Matrix4x4& viewProjectionMatrix, const Matrix
 	NoviceUtility::DrawLine(verticesScreen[1], verticesScreen[5], color);
 	NoviceUtility::DrawLine(verticesScreen[2], verticesScreen[6], color);
 	NoviceUtility::DrawLine(verticesScreen[3], verticesScreen[7], color);
+
+}
+
+void DrawBezier2(const Bezier2& bezier, const uint32_t division, const Matrix4x4& viewProjectionMatrix, const Matrix4x4& viewportMatrix, uint32_t color) {
+
+	if (division == 0) {
+
+		assert(false);
+
+		return;
+
+	}
+
+	const float segmantRatio = 1.0f / static_cast<float>(division);
+
+	float t = 0.0f;
+
+	Vector3 p0p1{};
+	Vector3 p1p2{};
+
+	Vector3 segmentStart = bezier.p[0];
+	Vector3 segmentEnd{};
+
+	Vector3 screenPos0{};
+	Vector3 screenPos1{};
+
+	for (const auto& p : bezier.p) {
+
+		DrawSphere(Sphere{ p, 0.01f }, viewProjectionMatrix, viewportMatrix, WHITE);
+
+	}
+
+	while (t <= 1.0f) {
+
+		t += segmantRatio;
+
+		p0p1 = Lerp(bezier.p[0], bezier.p[1], t);
+		p1p2 = Lerp(bezier.p[1], bezier.p[2], t);
+		segmentEnd = Lerp(p0p1, p1p2, t);
+
+		screenPos0 = ScreenTransform(segmentStart, viewProjectionMatrix, viewportMatrix);
+		screenPos1 = ScreenTransform(segmentEnd, viewProjectionMatrix, viewportMatrix);
+
+		segmentStart = segmentEnd;
+
+		NoviceUtility::DrawLine(screenPos0, screenPos1, color);
+
+	}
+
+}
+
+void DrawCatmullRom3(const CatmullRom3& spline, const uint32_t division, const Matrix4x4& viewProjectionMatrix, const Matrix4x4& viewportMatrix, uint32_t color) {
+
+	if (division == 0) {
+
+		assert(false);
+
+		return;
+
+	}
+
+	const float segmantRatio = 1.0f / static_cast<float>(division);
+
+	float t = 0.0f;
+
+	Vector3 segmentStart = spline.p[1];
+	Vector3 segmentEnd{};
+
+	Vector3 screenPos0{};
+	Vector3 screenPos1{};
+
+	for (const auto& p : spline.p) {
+
+		DrawSphere(Sphere{ p, 0.01f }, viewProjectionMatrix, viewportMatrix, WHITE);
+
+	}
+
+	while (t < 1.0f) {
+
+		t += segmantRatio;
+
+		if (t >= 1.0f) {
+
+			t = 1.0f;
+
+		}
+
+		segmentEnd = 0.5f * ((-spline.p[0] + 3.0f * spline.p[1] - 3.0f * spline.p[2] + spline.p[3]) * t * t * t +
+			(2.0f * spline.p[0] - 5.0f * spline.p[1] + 4.0f * spline.p[2] - spline.p[3]) * t * t +
+			(-spline.p[0] + spline.p[2]) * t + 2.0f * spline.p[1]);
+
+		screenPos0 = ScreenTransform(segmentStart, viewProjectionMatrix, viewportMatrix);
+		screenPos1 = ScreenTransform(segmentEnd, viewProjectionMatrix, viewportMatrix);
+
+		segmentStart = segmentEnd;
+
+		NoviceUtility::DrawLine(screenPos0, screenPos1, color);
+
+	}
 
 }
