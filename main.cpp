@@ -1,13 +1,17 @@
 ﻿#include "AABB.h"
+#include "Ball.h"
 #include "Bezier.h"
-#include "NoviceUtility.h"
 #include "Camera.h"
 #include "Collision.h"
+#include "DeltaTime.h"
 #include "DrawShapes.h"
 #include "Line.h"
 #include "Matrix3D.h"
+#include "Movement.h"
+#include "NoviceUtility.h"
 #include "OBB.h"
 #include "Sphere.h"
+#include "Spring.h"
 #include "Transform.h"
 #include <algorithm>
 #include <cmath>
@@ -34,8 +38,7 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 	char keys[256] = { 0 };
 	char preKeys[256] = { 0 };
 
-	std::unique_ptr<Camera> camera = nullptr;
-	camera.reset(new Camera());
+	std::unique_ptr<Camera> camera = std::make_unique<Camera>();
 
 	camera->SetTranslate(Vector3{ 0.0f, 1.9f, -6.49f });
 
@@ -44,10 +47,23 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 	Vector3 cameraPosition{};
 	Vector3 cameraRotate{};
 
-	Transform transforms[3]{};
-	Matrix4x4 worldMatrixs[3]{};
+	Vector3 gravity = { 0.0f, -9.8f, 0.0f };
 
-	bool isHit = false;
+	Ball weightBall{};
+	weightBall.radius = 0.1f;
+	weightBall.mass = 1.0f;
+	weightBall.position = { 1.0f, 1.0f, 0.0f };
+	weightBall.color = BLUE;
+
+	Spring spring{};
+	spring.anchor = { 0.0f, 1.0f, 0.0f };
+	spring.naturalLength = 0.5f;
+	spring.stiffness = 100.0f;
+	spring.dampingCoefficient = 2.0f;
+
+	std::unique_ptr<DeltaTime> timeManager = std::make_unique<DeltaTime>();
+
+	float deltaTime = 0.0f;
 
 	// ウィンドウの×ボタンが押されるまでループ
 	while (Novice::ProcessMessage() == 0) {
@@ -63,6 +79,9 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 		/// ↓更新処理ここから
 		///
 
+		timeManager->CalcDeltaTime();
+		deltaTime = timeManager->GetDeltaTime();
+
 		ImGui::Begin("camera");
 
 		cameraPosition = camera->GetTranslate();
@@ -75,44 +94,31 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 
 		ImGui::End();
 
+		ImGui::Begin("spring");
 
-		ImGui::Begin("transforms");
+		ImGui::Text("spring");
 
-		const char* text[3] = {
-			"transform0",
-			"transform1",
-			"transform2"
-		};
+		ImGui::DragFloat3("anchorPos", &spring.anchor.x, 0.03125f);
+		ImGui::DragFloat("naturalLength", &spring.naturalLength, 0.03125f);
+		ImGui::DragFloat("stiffness", &spring.stiffness);
+		ImGui::DragFloat("dampingCoefficient", &spring.dampingCoefficient, 0.03125f);
 
-		Matrix4x4 bufferMatrix = MakeIdentity4x4();
+		ImGui::Text("weight");
 
-		std::string bufferStr{};
+		ImGui::DragFloat3("weightPos", &weightBall.position.x);
+		ImGui::DragFloat("weightMass", &weightBall.mass);
+		
+		if (weightBall.mass <= 0.5f) {
 
-		for (size_t i = 0; i < 3; i++) {
-
-			ImGui::Text(text[i]);
-
-			bufferStr = "scale" + std::to_string(i);
-
-			ImGui::DragFloat3(bufferStr.c_str(), &transforms[i].scale.x, 0.03125f);
-
-			bufferStr = "rotate" + std::to_string(i);
-
-			ImGui::DragFloat3(bufferStr.c_str(), &transforms[i].rotate.x, 0.03125f);
-
-			bufferStr = "translate" + std::to_string(i);
-
-			ImGui::DragFloat3(bufferStr.c_str(), &transforms[i].translate.x, 0.03125f);
-
-			worldMatrixs[i] = MakeWorldMatrix(transforms[i]) * bufferMatrix;
-
-			bufferMatrix = worldMatrixs[i];
+			weightBall.mass = 0.5f;
 
 		}
 
 		ImGui::End();
 
 		camera->Update();
+
+		SpringBallMovement(spring, weightBall, gravity, deltaTime);
 
 		///
 		/// ↑更新処理ここまで
@@ -124,41 +130,7 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 
 		DrawGrid(camera->GetViewProjectionMatrix(), camera->GetViewportMatrix());
 
-		uint32_t objectsColor = BLACK;
-
-		if (isHit) {
-
-			objectsColor = RED;
-
-		}
-
-		const uint32_t colors[3] = {
-			RED, GREEN, BLUE
-		};
-
-		for (size_t i = 0; i < 3; i++) {
-
-			const auto& mat = worldMatrixs[i].m;
-
-			DrawSphere(Sphere{ Vector3{mat[3][0], mat[3][1], mat[3][2]}, 0.1f }, camera->GetViewProjectionMatrix(), camera->GetViewportMatrix(), colors[i]);
-
-		}
-
-		Vector3 screenPos0{};
-		Vector3 screenPos1{};
-
-		for (size_t i = 1; i < 3; i++) {
-
-			const auto& mat0 = worldMatrixs[i - 1].m;
-			const auto& mat1 = worldMatrixs[i].m;
-
-			screenPos0 = ScreenTransform(Vector3{ mat0[3][0], mat0[3][1], mat0[3][2] }, camera->GetViewProjectionMatrix(), camera->GetViewportMatrix());
-
-			screenPos1 = ScreenTransform(Vector3{ mat1[3][0], mat1[3][1], mat1[3][2] }, camera->GetViewProjectionMatrix(), camera->GetViewportMatrix());
-
-			NoviceUtility::DrawLine(screenPos0, screenPos1, WHITE);
-
-		}
+		DrawSpring(spring, weightBall, camera->GetViewProjectionMatrix(), camera->GetViewportMatrix(), weightBall.color);
 
 		///
 		/// ↑描画処理ここまで

@@ -426,3 +426,15 @@ void DrawCatmullRom3(const CatmullRom3& spline, const uint32_t division, const M
 	}
 
 }
+
+
+void DrawSpring(const Spring& spring, const Ball& weight, const Matrix4x4& viewProjectionMatrix, const Matrix4x4& viewportMatrix, uint32_t color) {
+
+	Vector3 anchorScreenPos = ScreenTransform(spring.anchor, viewProjectionMatrix, viewportMatrix);
+
+	Vector3 weightScreenPos = ScreenTransform(weight.position, viewProjectionMatrix, viewportMatrix);
+
+	NoviceUtility::DrawLine(anchorScreenPos, weightScreenPos, color);
+	DrawSphere(Sphere{weight.position, weight.radius}, viewProjectionMatrix, viewportMatrix, color);
+
+}
