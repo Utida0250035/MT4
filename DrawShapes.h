@@ -9,6 +9,8 @@
 #include "Triangle.h"
 #include "Bezier.h"
 #include "CatmullRom.h"
+#include "Spring.h"
+#include "Ball.h"
 #include <stdint.h>
 
 void DrawGrid(const Matrix4x4& viewProjectionMatrix, const Matrix4x4& viewportMatrix);
@@ -32,3 +34,5 @@ void DrawOBB(const OBB& obb, const Matrix4x4& viewProjectionMatrix, const Matrix
 void DrawBezier2(const Bezier2& bezier, const uint32_t division, const Matrix4x4& viewProjectionMatrix, const Matrix4x4& viewportMatrix, uint32_t color);
 
 void DrawCatmullRom3(const CatmullRom3& spline, const uint32_t division, const Matrix4x4& viewProjectionMatrix, const Matrix4x4& viewportMatrix, uint32_t color);
+
+void DrawSpring(const Spring& spring, const Ball& weight, const Matrix4x4& viewProjectionMatrix, const Matrix4x4& viewportMatrix, uint32_t color);

@@ -53,6 +53,12 @@
     <ClCompile Include="OBB.cpp">
       <Filter>KamataEngine</Filter>
     </ClCompile>
+    <ClCompile Include="Movement.cpp">
+      <Filter>KamataEngine</Filter>
+    </ClCompile>
+    <ClCompile Include="DeltaTime.cpp">
+      <Filter>KamataEngine</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="C:\KamataEngine\DirectXGame\audio\Audio.h">
@@ -152,5 +158,9 @@
     <ClInclude Include="Bezier.h" />
     <ClInclude Include="CatmullRom.h" />
     <ClInclude Include="Transform.h" />
+    <ClInclude Include="Ball.h" />
+    <ClInclude Include="Spring.h" />
+    <ClInclude Include="Movement.h" />
+    <ClInclude Include="DeltaTime.h" />
   </ItemGroup>
 </Project>
