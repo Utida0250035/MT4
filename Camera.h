@@ -2,7 +2,7 @@
 #include "Matrix3D.h"
 #include "Vector2.h"
 
-class Camera {
+class DebugCamera {
 
 private:
 

@@ -38,7 +38,7 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 	char keys[256] = { 0 };
 	char preKeys[256] = { 0 };
 
-	std::unique_ptr<Camera> camera = std::make_unique<Camera>();
+	std::unique_ptr<DebugCamera> camera = std::make_unique<DebugCamera>();
 
 	camera->SetTranslate(Vector3{ 0.0f, 1.9f, -6.49f });
 
@@ -47,23 +47,21 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 	Vector3 cameraPosition{};
 	Vector3 cameraRotate{};
 
-	Vector3 gravity = { 0.0f, -9.8f, 0.0f };
+	Sphere moveSphere{};
+	moveSphere.radius = 0.1f;
+	Vector3 origin{};
 
-	Ball weightBall{};
-	weightBall.radius = 0.1f;
-	weightBall.mass = 1.0f;
-	weightBall.position = { 1.0f, 1.0f, 0.0f };
-	weightBall.color = BLUE;
-
-	Spring spring{};
-	spring.anchor = { 0.0f, 1.0f, 0.0f };
-	spring.naturalLength = 0.5f;
-	spring.stiffness = 100.0f;
-	spring.dampingCoefficient = 2.0f;
+	float angularVel = std::numbers::pi_v<float>;
+	float angle = 0.0f;
+	float orbitRadius = 0.75f;
+	Vector3 velocity{};
+	Vector3 acceleration{};
 
 	std::unique_ptr<DeltaTime> timeManager = std::make_unique<DeltaTime>();
 
 	float deltaTime = 0.0f;
+
+	bool isMove = false;
 
 	// ウィンドウの×ボタンが押されるまでループ
 	while (Novice::ProcessMessage() == 0) {
@@ -94,31 +92,50 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 
 		ImGui::End();
 
-		ImGui::Begin("spring");
+		camera->Update();
 
-		ImGui::Text("spring");
+		ImGui::Begin("circularMotion");
 
-		ImGui::DragFloat3("anchorPos", &spring.anchor.x, 0.03125f);
-		ImGui::DragFloat("naturalLength", &spring.naturalLength, 0.03125f);
-		ImGui::DragFloat("stiffness", &spring.stiffness);
-		ImGui::DragFloat("dampingCoefficient", &spring.dampingCoefficient, 0.03125f);
+		ImGui::SmallButton("begin");
 
-		ImGui::Text("weight");
+		if (ImGui::IsItemActivated()) {
 
-		ImGui::DragFloat3("weightPos", &weightBall.position.x);
-		ImGui::DragFloat("weightMass", &weightBall.mass);
-		
-		if (weightBall.mass <= 0.5f) {
+			if (!isMove) {
 
-			weightBall.mass = 0.5f;
+				isMove = true;
+
+			}
 
 		}
 
+		if (isMove) {
+
+			angle += angularVel * deltaTime;
+
+			moveSphere.center = {
+				origin.x + std::cos(angle) * orbitRadius,
+				origin.y + std::sin(angle) * orbitRadius,
+				origin.z
+			};
+
+			velocity = {
+				-orbitRadius * angularVel * std::sin(angle),
+				orbitRadius * angularVel * std::cos(angle),
+				0.0f
+			};
+
+			acceleration = {
+				-orbitRadius * angularVel * angularVel * std::cos(angle),
+				-orbitRadius * angularVel * angularVel * std::sin(angle),
+				0.0f
+			};
+
+		}
+
+		ImGui::DragFloat3("velocity", &velocity.x);
+		ImGui::DragFloat3("acceleration", &acceleration.x);
+
 		ImGui::End();
-
-		camera->Update();
-
-		SpringBallMovement(spring, weightBall, gravity, deltaTime);
 
 		///
 		/// ↑更新処理ここまで
@@ -130,7 +147,7 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 
 		DrawGrid(camera->GetViewProjectionMatrix(), camera->GetViewportMatrix());
 
-		DrawSpring(spring, weightBall, camera->GetViewProjectionMatrix(), camera->GetViewportMatrix(), weightBall.color);
+		DrawSphere(moveSphere, camera->GetViewProjectionMatrix(), camera->GetViewportMatrix(), GREEN);
 
 		///
 		/// ↑描画処理ここまで

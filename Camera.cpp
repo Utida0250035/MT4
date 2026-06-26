@@ -3,7 +3,7 @@
 #include <Novice.h>
 #include <ImGui.h>
 
-void Camera::Update() {
+void DebugCamera::Update() {
 
 	this->MoveInput();
 
@@ -17,7 +17,7 @@ void Camera::Update() {
 
 }
 
-void Camera::MoveInput() {
+void DebugCamera::MoveInput() {
 
 	if (ImGui::GetIO().WantCaptureMouse) {
 
@@ -63,7 +63,7 @@ void Camera::MoveInput() {
 }
 
 
-void Camera::Move() {
+void DebugCamera::Move() {
 
 	rotate_ += angularVelocity_;
 
