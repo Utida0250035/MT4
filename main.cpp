@@ -47,27 +47,19 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 	Vector3 cameraPosition{};
 	Vector3 cameraRotate{};
 
-	Sphere moveSphere{};
-	moveSphere.radius = 0.1f;
-	Vector3 origin{};
+	Ball weightBall{};
+	weightBall.radius = 0.1f;
+	weightBall.mass = 1.0f;
+	weightBall.position = { 1.0f, 1.0f, 0.0f };
+	weightBall.color = BLUE;
 
-	float angularVel = std::numbers::pi_v<float>;
-	float angle = 0.0f;
-	float orbitRadius = 0.75f;
-	Vector3 velocity{};
-	Vector3 acceleration{};
+	Spring spring{};
+	spring.anchor = { 0.0f, 1.0f, 0.0f };
+	spring.naturalLength = 0.5f;
+	spring.stiffness = 100.0f;
+	spring.dampingCoefficient = 2.0f;
 
-
-	Vector3 a{ 0.2f, 1.0f, 0.0f };
-	Vector3 b{ 2.4f, 3.1f, 1.2f };
-	Vector3 c = a + b;
-	Vector3 d = a - b;
-	Vector3 e = a * 2.4f;
-	Vector3 rotate{ 0.4f, 1.43f, -0.8f };
-	Matrix4x4 xRotateMatrix = MakeXRotateMatrix(rotate.x);
-	Matrix4x4 yRotateMatrix = MakeYRotateMatrix(rotate.y);
-	Matrix4x4 zRotateMatrix = MakeZRotateMatrix(rotate.z);
-	Matrix4x4 rotateMatrix = xRotateMatrix * yRotateMatrix * zRotateMatrix;
+	Vector3 gravity = { 0.0f, -20.0f, 0.0f };
 
 	std::unique_ptr<DeltaTime> timeManager = std::make_unique<DeltaTime>();
 
@@ -106,9 +98,9 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 
 		camera->Update();
 
-		ImGui::Begin("circularMotion");
+		ImGui::Begin("spring");
 
-		ImGui::SmallButton("begin");
+		ImGui::SmallButton("start");
 
 		if (ImGui::IsItemActivated()) {
 
@@ -120,56 +112,31 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 
 		}
 
+		ImGui::Text("spring");
+
+		ImGui::DragFloat3("anchorPos", &spring.anchor.x, 0.03125f);
+		ImGui::DragFloat("naturalLength", &spring.naturalLength, 0.03125f);
+		ImGui::DragFloat("stiffness", &spring.stiffness);
+		ImGui::DragFloat("dampingCoefficient", &spring.dampingCoefficient, 0.03125f);
+
+		ImGui::Text("weight");
+
+		ImGui::DragFloat3("weightPos", &weightBall.position.x);
+		ImGui::DragFloat("weightMass", &weightBall.mass);
+
+		if (weightBall.mass <= 0.5f) {
+
+			weightBall.mass = 0.5f;
+
+		}
+
+		ImGui::End();
+
 		if (isMove) {
 
-			angle += angularVel * deltaTime;
-
-			moveSphere.center = {
-				origin.x + std::cos(angle) * orbitRadius,
-				origin.y + std::sin(angle) * orbitRadius,
-				origin.z
-			};
-
-			velocity = {
-				-orbitRadius * angularVel * std::sin(angle),
-				orbitRadius * angularVel * std::cos(angle),
-				0.0f
-			};
-
-			acceleration = {
-				-orbitRadius * angularVel * angularVel * std::cos(angle),
-				-orbitRadius * angularVel * angularVel * std::sin(angle),
-				0.0f
-			};
+			SpringBallMovement(spring, weightBall, gravity, deltaTime);
 
 		}
-
-		ImGui::DragFloat3("velocity", &velocity.x);
-		ImGui::DragFloat3("acceleration", &acceleration.x);
-
-		ImGui::End();
-
-		ImGui::Begin("Window");
-
-		Vector3 bufferVector = c;
-		ImGui::DragFloat3("c", &bufferVector.x);
-
-		bufferVector = d;
-		ImGui::DragFloat3("d", &bufferVector.x);
-
-		bufferVector = e;
-		ImGui::DragFloat3("e", &bufferVector.x);
-
-
-		ImGui::Text("matrix:");
-
-		for (const auto& m : rotateMatrix.m) {
-
-			ImGui::Text(" %f, %f, %f, %f", m[0], m[1], m[2], m[3]);
-
-		}
-
-		ImGui::End();
 
 		///
 		/// ↑更新処理ここまで
@@ -181,7 +148,7 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 
 		DrawGrid(camera->GetViewProjectionMatrix(), camera->GetViewportMatrix());
 
-		DrawSphere(moveSphere, camera->GetViewProjectionMatrix(), camera->GetViewportMatrix(), GREEN);
+		DrawSpring(spring, weightBall, camera->GetViewProjectionMatrix(), camera->GetViewportMatrix(), weightBall.color);
 
 		///
 		/// ↑描画処理ここまで
