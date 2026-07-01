@@ -57,6 +57,18 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 	Vector3 velocity{};
 	Vector3 acceleration{};
 
+
+	Vector3 a{ 0.2f, 1.0f, 0.0f };
+	Vector3 b{ 2.4f, 3.1f, 1.2f };
+	Vector3 c = a + b;
+	Vector3 d = a - b;
+	Vector3 e = a * 2.4f;
+	Vector3 rotate{ 0.4f, 1.43f, -0.8f };
+	Matrix4x4 xRotateMatrix = MakeXRotateMatrix(rotate.x);
+	Matrix4x4 yRotateMatrix = MakeYRotateMatrix(rotate.y);
+	Matrix4x4 zRotateMatrix = MakeZRotateMatrix(rotate.z);
+	Matrix4x4 rotateMatrix = xRotateMatrix * yRotateMatrix * zRotateMatrix;
+
 	std::unique_ptr<DeltaTime> timeManager = std::make_unique<DeltaTime>();
 
 	float deltaTime = 0.0f;
@@ -134,6 +146,28 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 
 		ImGui::DragFloat3("velocity", &velocity.x);
 		ImGui::DragFloat3("acceleration", &acceleration.x);
+
+		ImGui::End();
+
+		ImGui::Begin("Window");
+
+		Vector3 bufferVector = c;
+		ImGui::DragFloat3("c", &bufferVector.x);
+
+		bufferVector = d;
+		ImGui::DragFloat3("d", &bufferVector.x);
+
+		bufferVector = e;
+		ImGui::DragFloat3("e", &bufferVector.x);
+
+
+		ImGui::Text("matrix:");
+
+		for (const auto& m : rotateMatrix.m) {
+
+			ImGui::Text(" %f, %f, %f, %f", m[0], m[1], m[2], m[3]);
+
+		}
 
 		ImGui::End();
 
