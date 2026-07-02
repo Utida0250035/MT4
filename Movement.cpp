@@ -13,9 +13,11 @@ void SpringBallMovement(Spring& spring, Ball& ball, const Vector3 gravity, const
 		Vector3 restoringForce = -spring.stiffness * displacement;
 		Vector3 dampingForce = -spring.dampingCoefficient * ball.velocity;
 		Vector3 force = restoringForce + dampingForce;
-		ball.acceleration = force / ball.mass + gravity;
+		ball.acceleration = force / ball.mass;
 
 	}
+
+	ball.acceleration += gravity;
 
 	ball.velocity += ball.acceleration * deltaTime;
 	ball.position += ball.velocity * deltaTime;
