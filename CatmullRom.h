@@ -4,6 +4,6 @@
 
 struct CatmullRom3 {
 
-	Vector3 p[3];
+	Vector3 p[4];
 
 };

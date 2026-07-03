@@ -10,6 +10,7 @@
 #include "Movement.h"
 #include "NoviceUtility.h"
 #include "OBB.h"
+#include "Pendulum.h"
 #include "Sphere.h"
 #include "Spring.h"
 #include "Transform.h"
@@ -50,16 +51,14 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 	Ball weightBall{};
 	weightBall.radius = 0.1f;
 	weightBall.mass = 1.0f;
-	weightBall.position = { 1.0f, 1.0f, 0.0f };
 	weightBall.color = BLUE;
 
-	Spring spring{};
-	spring.anchor = { 0.0f, 1.0f, 0.0f };
-	spring.naturalLength = 0.5f;
-	spring.stiffness = 100.0f;
-	spring.dampingCoefficient = 2.0f;
+	Pendulum pendulum{};
+	pendulum.anchorPos = { 0.0f, 1.5f, 0.0f };
+	pendulum.length = 1.0f;
+	pendulum.angle = 45.0f * std::numbers::pi_v<float> / 180.0f;
 
-	Vector3 gravity = { 0.0f, -20.0f, 0.0f };
+	Vector3 gravity = { 0.0f, -8.0f, 0.0f };
 
 	std::unique_ptr<DeltaTime> timeManager = std::make_unique<DeltaTime>();
 
@@ -98,7 +97,7 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 
 		camera->Update();
 
-		ImGui::Begin("spring");
+		ImGui::Begin("pendulum");
 
 		ImGui::SmallButton("start");
 
@@ -112,29 +111,34 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 
 		}
 
-		ImGui::Text("spring");
+		ImGui::Text("pendulum");
 
-		ImGui::DragFloat3("anchorPos", &spring.anchor.x, 0.03125f);
-		ImGui::DragFloat("naturalLength", &spring.naturalLength, 0.03125f);
-		ImGui::DragFloat("stiffness", &spring.stiffness);
-		ImGui::DragFloat("dampingCoefficient", &spring.dampingCoefficient, 0.03125f);
+		ImGui::DragFloat3("anchorPos", &pendulum.anchorPos.x, 0.03125f);
+		ImGui::DragFloat("length", &pendulum.length, 0.03125f);
+
+		float angleDegree = pendulum.angle / std::numbers::pi_v<float> * 180.0f;
+
+		ImGui::DragFloat("angle(deg)", &angleDegree, 0.25f);
+
+		if (ImGui::IsItemActive()) {
+
+			pendulum.angularAcceleration = 0.0f;
+			pendulum.angularVelocity = 0.0f;
+			pendulum.angle = angleDegree * std::numbers::pi_v<float> / 180.0f;
+
+		}
 
 		ImGui::Text("weight");
 
 		ImGui::DragFloat3("weightPos", &weightBall.position.x);
-		ImGui::DragFloat("weightMass", &weightBall.mass);
-
-		if (weightBall.mass <= 0.5f) {
-
-			weightBall.mass = 0.5f;
-
-		}
+		ImGui::DragFloat3("velocity", &weightBall.velocity.x);
+		ImGui::DragFloat3("acceleration", &weightBall.acceleration.x);
 
 		ImGui::End();
 
 		if (isMove) {
 
-			SpringBallMovement(spring, weightBall, gravity, deltaTime);
+			PendulumBallMovement2D(pendulum, weightBall, gravity.y, deltaTime);
 
 		}
 
@@ -148,7 +152,7 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 
 		DrawGrid(camera->GetViewProjectionMatrix(), camera->GetViewportMatrix());
 
-		DrawSpring(spring, weightBall, camera->GetViewProjectionMatrix(), camera->GetViewportMatrix(), weightBall.color);
+		DrawPendulum(pendulum, weightBall, camera->GetViewProjectionMatrix(), camera->GetViewportMatrix(), weightBall.color);
 
 		///
 		/// ↑描画処理ここまで

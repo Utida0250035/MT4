@@ -162,5 +162,6 @@
     <ClInclude Include="Spring.h" />
     <ClInclude Include="Movement.h" />
     <ClInclude Include="DeltaTime.h" />
+    <ClInclude Include="Pendulum.h" />
   </ItemGroup>
 </Project>
