@@ -3,6 +3,7 @@
 #include "Bezier.h"
 #include "Camera.h"
 #include "Collision.h"
+#include "ConicalPendulum.h"
 #include "DeltaTime.h"
 #include "DrawShapes.h"
 #include "Line.h"
@@ -48,15 +49,16 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 	Vector3 cameraPosition{};
 	Vector3 cameraRotate{};
 
-	Ball weightBall{};
-	weightBall.radius = 0.1f;
-	weightBall.mass = 1.0f;
-	weightBall.color = BLUE;
+	Ball bobBall{};
+	bobBall.radius = 0.1f;
+	bobBall.mass = 1.0f;
+	bobBall.color = BLUE;
 
-	Pendulum pendulum{};
-	pendulum.anchorPos = { 0.0f, 1.5f, 0.0f };
-	pendulum.length = 1.0f;
-	pendulum.angle = 45.0f * std::numbers::pi_v<float> / 180.0f;
+	ConicalPendulum conicalPendulum{};
+	conicalPendulum.anchorPos = { 0.0f, 1.5f, 0.0f };
+	conicalPendulum.length = 1.0f;
+	conicalPendulum.angle = 45.0f * std::numbers::pi_v<float> / 180.0f;
+	conicalPendulum.halfApexAngle = 80.0f * std::numbers::pi_v<float> / 180.0f;
 
 	Vector3 gravity = { 0.0f, -8.0f, 0.0f };
 
@@ -113,32 +115,39 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 
 		ImGui::Text("pendulum");
 
-		ImGui::DragFloat3("anchorPos", &pendulum.anchorPos.x, 0.03125f);
-		ImGui::DragFloat("length", &pendulum.length, 0.03125f);
+		ImGui::DragFloat3("anchorPos", &conicalPendulum.anchorPos.x, 0.03125f);
+		ImGui::DragFloat("length", &conicalPendulum.length, 0.03125f);
 
-		float angleDegree = pendulum.angle / std::numbers::pi_v<float> * 180.0f;
+		if (ImGui::IsItemActive()) {
+
+			conicalPendulum.length = std::max(0.5f, conicalPendulum.length);
+
+		}
+
+		float angleDegree = conicalPendulum.angle / std::numbers::pi_v<float> * 180.0f;
 
 		ImGui::DragFloat("angle(deg)", &angleDegree, 0.25f);
 
 		if (ImGui::IsItemActive()) {
 
-			pendulum.angularAcceleration = 0.0f;
-			pendulum.angularVelocity = 0.0f;
-			pendulum.angle = angleDegree * std::numbers::pi_v<float> / 180.0f;
+			conicalPendulum.angularVelocity = 0.0f;
+			conicalPendulum.angle = angleDegree * std::numbers::pi_v<float> / 180.0f;
 
 		}
 
 		ImGui::Text("weight");
 
-		ImGui::DragFloat3("weightPos", &weightBall.position.x);
-		ImGui::DragFloat3("velocity", &weightBall.velocity.x);
-		ImGui::DragFloat3("acceleration", &weightBall.acceleration.x);
+		ImGui::DragFloat3("weightPos", &bobBall.position.x);
+		ImGui::DragFloat3("velocity", &bobBall.velocity.x);
+		ImGui::Text("magnitude: %f", VectorLength(bobBall.velocity));
+		ImGui::DragFloat3("acceleration", &bobBall.acceleration.x);
+		ImGui::Text("magnitude: %f", VectorLength(bobBall.acceleration));
 
 		ImGui::End();
 
 		if (isMove) {
 
-			PendulumBallMovement2D(pendulum, weightBall, gravity.y, deltaTime);
+			ConicalPendulumBallMovement2D(conicalPendulum, bobBall, gravity.y, deltaTime);
 
 		}
 
@@ -152,7 +161,7 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 
 		DrawGrid(camera->GetViewProjectionMatrix(), camera->GetViewportMatrix());
 
-		DrawPendulum(pendulum, weightBall, camera->GetViewProjectionMatrix(), camera->GetViewportMatrix(), weightBall.color);
+		DrawConicalPendulum(conicalPendulum, bobBall, camera->GetViewProjectionMatrix(), camera->GetViewportMatrix(), bobBall.color);
 
 		///
 		/// ↑描画処理ここまで

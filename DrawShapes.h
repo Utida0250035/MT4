@@ -4,6 +4,7 @@
 #include "Ball.h"
 #include "Bezier.h"
 #include "CatmullRom.h"
+#include "ConicalPendulum.h"
 #include "Line.h"
 #include "Matrix3D.h"
 #include "OBB.h"
@@ -38,4 +39,6 @@ void DrawCatmullRom3(const CatmullRom3& spline, const uint32_t division, const M
 
 void DrawSpring(const Spring& spring, const Ball& weight, const Matrix4x4& viewProjectionMatrix, const Matrix4x4& viewportMatrix, uint32_t color);
 
-void DrawPendulum(const Pendulum& pendulum, const Ball& weight, const Matrix4x4& viewProjectionMatrix, const Matrix4x4& viewportMatrix, uint32_t color);
+void DrawPendulum(const Pendulum& pendulum, const Ball& bob, const Matrix4x4& viewProjectionMatrix, const Matrix4x4& viewportMatrix, uint32_t color);
+
+void DrawConicalPendulum(const ConicalPendulum& conicalPendulum, const Ball& bob, const Matrix4x4& viewProjectionMatrix, const Matrix4x4& viewportMatrix, uint32_t color);

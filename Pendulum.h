@@ -6,7 +6,7 @@
 struct Pendulum {
 
 	Vector3 anchorPos;
-	Vector3 weightPos;
+	Vector3 bobPos;
 	float length;
 	float angle;
 	float angularVelocity;
@@ -16,7 +16,7 @@ struct Pendulum {
 
 inline constexpr Vector3 VelocityFromOmega2D(const Pendulum& pendulum) {
 
-	Vector3 difference = pendulum.anchorPos - pendulum.weightPos;
+	Vector3 difference = pendulum.anchorPos - pendulum.bobPos;
 
 	assert(difference.z == 0.0f);
 
@@ -30,7 +30,7 @@ inline constexpr Vector3 VelocityFromOmega2D(const Pendulum& pendulum) {
 
 inline constexpr Vector3 AccelerationFromOmegaAndAlpha2D(const Pendulum& pendulum) {
 
-	Vector3 anchorToWeight = pendulum.anchorPos - pendulum.weightPos;
+	Vector3 anchorToWeight = pendulum.anchorPos - pendulum.bobPos;
 
 	assert(anchorToWeight.z == 0.0f);
 

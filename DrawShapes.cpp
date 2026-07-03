@@ -439,13 +439,24 @@ void DrawSpring(const Spring& spring, const Ball& weight, const Matrix4x4& viewP
 
 }
 
-void DrawPendulum(const Pendulum& pendulum, const Ball& weight, const Matrix4x4& viewProjectionMatrix, const Matrix4x4& viewportMatrix, uint32_t color) {
+void DrawPendulum(const Pendulum& pendulum, const Ball& bob, const Matrix4x4& viewProjectionMatrix, const Matrix4x4& viewportMatrix, uint32_t color) {
 
 	Vector3 anchorScreenPos = ScreenTransform(pendulum.anchorPos, viewProjectionMatrix, viewportMatrix);
 
-	Vector3 weightScreenPos = ScreenTransform(weight.position, viewProjectionMatrix, viewportMatrix);
+	Vector3 weightScreenPos = ScreenTransform(bob.position, viewProjectionMatrix, viewportMatrix);
 
 	NoviceUtility::DrawLine(anchorScreenPos, weightScreenPos, color);
-	DrawSphere(Sphere{ weight.position, weight.radius }, viewProjectionMatrix, viewportMatrix, color);
+	DrawSphere(Sphere{ bob.position, bob.radius }, viewProjectionMatrix, viewportMatrix, color);
+
+}
+
+void DrawConicalPendulum(const ConicalPendulum& conicalPendulum, const Ball& bob, const Matrix4x4& viewProjectionMatrix, const Matrix4x4& viewportMatrix, uint32_t color) {
+
+	Vector3 bobScreenPos = ScreenTransform(conicalPendulum.anchorPos, viewProjectionMatrix, viewportMatrix);
+
+	Vector3 weightScreenPos = ScreenTransform(bob.position, viewProjectionMatrix, viewportMatrix);
+
+	NoviceUtility::DrawLine(bobScreenPos, weightScreenPos, color);
+	DrawSphere(Sphere{ bob.position, bob.radius }, viewProjectionMatrix, viewportMatrix, color);
 
 }
