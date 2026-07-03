@@ -438,3 +438,14 @@ void DrawSpring(const Spring& spring, const Ball& weight, const Matrix4x4& viewP
 	DrawSphere(Sphere{weight.position, weight.radius}, viewProjectionMatrix, viewportMatrix, color);
 
 }
+
+void DrawPendulum(const Pendulum& pendulum, const Ball& weight, const Matrix4x4& viewProjectionMatrix, const Matrix4x4& viewportMatrix, uint32_t color) {
+
+	Vector3 anchorScreenPos = ScreenTransform(pendulum.anchorPos, viewProjectionMatrix, viewportMatrix);
+
+	Vector3 weightScreenPos = ScreenTransform(weight.position, viewProjectionMatrix, viewportMatrix);
+
+	NoviceUtility::DrawLine(anchorScreenPos, weightScreenPos, color);
+	DrawSphere(Sphere{ weight.position, weight.radius }, viewProjectionMatrix, viewportMatrix, color);
+
+}

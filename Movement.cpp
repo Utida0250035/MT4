@@ -1,4 +1,5 @@
 ﻿#include "Movement.h"
+#include <cmath>
 
 void SpringBallMovement(Spring& spring, Ball& ball, const Vector3 gravity, const float deltaTime) {
 
@@ -21,5 +22,27 @@ void SpringBallMovement(Spring& spring, Ball& ball, const Vector3 gravity, const
 
 	ball.velocity += ball.acceleration * deltaTime;
 	ball.position += ball.velocity * deltaTime;
+
+}
+
+void PendulumBallMovement2D(Pendulum& pendulum, Ball& ball, const float gravity, const float deltaTime) {
+
+	pendulum.angularAcceleration = gravity / pendulum.length * std::sin(pendulum.angle);
+
+	pendulum.angularVelocity += pendulum.angularAcceleration * deltaTime;
+
+	pendulum.angle += pendulum.angularVelocity * deltaTime;
+
+	pendulum.weightPos = {
+		pendulum.anchorPos.x + std::sin(pendulum.angle) * pendulum.length,
+		pendulum.anchorPos.y - std::cos(pendulum.angle) * pendulum.length,
+		pendulum.anchorPos.z
+	};
+
+	ball.position = pendulum.weightPos;
+
+	ball.velocity = VelocityFromOmega2D(pendulum);
+
+	ball.acceleration = AccelerationFromOmegaAndAlpha2D(pendulum);
 
 }
