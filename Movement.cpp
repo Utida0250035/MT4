@@ -11,7 +11,7 @@ void SpringBallMovement(Spring& spring, Ball& ball, const Vector3 gravity, const
 
 		Vector3 direction = VectorNormalize(diff);
 		Vector3 restPosition = spring.anchor + direction * spring.naturalLength;
-		Vector3 displacement = length * (ball.position - restPosition);
+		Vector3 displacement = ball.position - restPosition;
 		Vector3 restoringForce = -spring.stiffness * displacement;
 		Vector3 dampingForce = -spring.dampingCoefficient * ball.velocity;
 		Vector3 force = restoringForce + dampingForce;
