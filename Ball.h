@@ -7,6 +7,7 @@ struct Ball {
 	Vector3 velocity;
 	Vector3 acceleration;
 	float mass;
+	float bounciness;
 	float radius;
 	unsigned int color;
 };

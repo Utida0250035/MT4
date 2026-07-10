@@ -67,7 +67,7 @@ bool IsLineHitPlane(const Line& line, const Plane& plane) {
 
 }
 
-static bool IsLineHitPlane(const Line& line, const Plane& plane, float& t) {
+bool IsLineHitPlane(const Line& line, const Plane& plane, float& t) {
 
 	if (!CalcT(line.origin, line.difference, plane, t)) {
 
@@ -83,23 +83,11 @@ bool IsRayHitPlane(const Ray& ray, const Plane& plane) {
 
 	float t = 0.0f;
 
-	if (!CalcT(ray.origin, ray.difference, plane, t)) {
-
-		return false;
-
-	}
-
-	if (t >= 0.0f) {
-
-		return true;
-
-	}
-
-	return false;
+	return IsRayHitPlane(ray, plane, t);
 
 }
 
-static bool IsRayHitPlane(const Ray& ray, const Plane& plane, float& t) {
+bool IsRayHitPlane(const Ray& ray, const Plane& plane, float& t) {
 
 	if (!CalcT(ray.origin, ray.difference, plane, t)) {
 
@@ -121,23 +109,11 @@ bool IsSegmentHitPlane(const Segment& segment, const Plane& plane) {
 
 	float t = 0.0f;
 
-	if (!CalcT(segment.origin, segment.difference, plane, t)) {
-
-		return false;
-
-	}
-
-	if (t <= 1.0f && t >= 0.0f) {
-
-		return true;
-
-	}
-
-	return false;
+	return IsSegmentHitPlane(segment, plane, t);
 
 }
 
-static bool IsSegmentHitPlane(const Segment& segment, const Plane& plane, float& t) {
+bool IsSegmentHitPlane(const Segment& segment, const Plane& plane, float& t) {
 
 	if (!CalcT(segment.origin, segment.difference, plane, t)) {
 
@@ -194,9 +170,17 @@ static bool IsPointInTriangle(const Vector3& point, const Triangle& triangle, co
 
 bool IsLineHitTriangle(const Line& line, const Triangle& triangle) {
 
+	float t = 0.0f;
+
+	return IsLineHitTriangle(line, triangle, t);
+
+}
+
+bool IsLineHitTriangle(const Line& line, const Triangle& triangle, float& t) {
+
 	Plane plane = MakePlane(triangle.vertices);
 
-	float t = 0.0f;
+	t = 0.0f;
 
 	if (!IsLineHitPlane(line, plane, t)) {
 
@@ -212,9 +196,17 @@ bool IsLineHitTriangle(const Line& line, const Triangle& triangle) {
 
 bool IsRayHitTriangle(const Ray& ray, const Triangle& triangle) {
 
+	float t = 0.0f;
+
+	return IsRayHitTriangle(ray, triangle, t);
+
+}
+
+bool IsRayHitTriangle(const Ray& ray, const Triangle& triangle, float& t) {
+
 	Plane plane = MakePlane(triangle.vertices);
 
-	float t = 0.0f;
+	t = 0.0f;
 
 	if (!IsRayHitPlane(ray, plane, t)) {
 
@@ -230,9 +222,17 @@ bool IsRayHitTriangle(const Ray& ray, const Triangle& triangle) {
 
 bool IsSegmentHitTriangle(const Segment& segment, const Triangle& triangle) {
 
+	float t = 0.0f;
+
+	return IsSegmentHitTriangle(segment, triangle, t);
+
+}
+
+bool IsSegmentHitTriangle(const Segment& segment, const Triangle& triangle, float& t) {
+
 	Plane plane = MakePlane(triangle.vertices);
 
-	float t = 0.0f;
+	t = 0.0f;
 
 	if (!IsSegmentHitPlane(segment, plane, t)) {
 
@@ -268,7 +268,15 @@ bool IsHitAABBs(const AABB& box1, const AABB& box2) {
 
 bool IsSphereHitAABB(const Sphere& sphere, const AABB& aabb) {
 
-	Vector3 closestPoint{
+	Vector3 closestPoint{};
+
+	return IsSphereHitAABB(sphere, aabb, closestPoint);
+
+}
+
+bool IsSphereHitAABB(const Sphere& sphere, const AABB& aabb, Vector3& closestPoint) {
+
+	closestPoint = {
 		std::clamp(sphere.center.x, aabb.min.x, aabb.max.x),
 		std::clamp(sphere.center.y, aabb.min.y, aabb.max.y),
 		std::clamp(sphere.center.z, aabb.min.z, aabb.max.z),
@@ -362,6 +370,15 @@ bool IsLineHitAABB(const Line& segment, const AABB& aabb) {
 	float tNear = 0.0f;
 	float tFar = 0.0f;
 
+	return IsLineHitAABB(segment, aabb, tNear, tFar);
+
+}
+
+bool IsLineHitAABB(const Line& segment, const AABB& aabb, float& tNear, float& tFar) {
+
+	tNear = 0.0f;
+	tFar = 0.0f;
+
 	if (!IsGenericLineIntersectAABB(segment.origin, segment.difference, aabb, tNear, tFar)) {
 
 		return false;
@@ -393,10 +410,40 @@ bool IsRayHitAABB(const Ray& segment, const AABB& aabb) {
 
 }
 
+bool IsRayHitAABB(const Ray& segment, const AABB& aabb, float& tNear, float& tFar) {
+
+	tNear = 0.0f;
+	tFar = 0.9f;
+
+	if (!IsGenericLineIntersectAABB(segment.origin, segment.difference, aabb, tNear, tFar)) {
+
+		return false;
+
+	}
+
+	if (tFar < 0.0f) {
+
+		return false;
+
+	}
+
+	return true;
+
+}
+
 bool IsSegmentHitAABB(const Segment& segment, const AABB& aabb) {
 
 	float tNear = 0.0f;
 	float tFar = 0.0f;
+
+	return IsSegmentHitAABB(segment, aabb, tNear, tFar);
+
+}
+
+bool IsSegmentHitAABB(const Segment& segment, const AABB& aabb, float& tNear, float& tFar) {
+
+	tNear = 0.0f;
+	tFar = 0.0f;
 
 	if (!IsGenericLineIntersectAABB(segment.origin, segment.difference, aabb, tNear, tFar)) {
 
@@ -414,9 +461,9 @@ bool IsSegmentHitAABB(const Segment& segment, const AABB& aabb) {
 
 }
 
-bool IsSphereHitOBB(const Sphere& sphere, const OBB& obb, const Matrix4x4& obbObjectTransformMatrix) {
+bool IsSphereHitOBB(const Sphere& sphere, const OBB& obb) {
 
-	Matrix4x4 obbWorldMatrixInverse = MatrixInverse(obbObjectTransformMatrix);
+	Matrix4x4 obbWorldMatrixInverse = MatrixInverse(GetObbWorldMatrix(obb));
 
 	Vector3 centerInObbLocal = VectorTransform(sphere.center, obbWorldMatrixInverse);
 
@@ -425,12 +472,6 @@ bool IsSphereHitOBB(const Sphere& sphere, const OBB& obb, const Matrix4x4& obbOb
 	Sphere sphereFromObbLocal{ centerInObbLocal, sphere.radius };
 
 	return IsSphereHitAABB(sphereFromObbLocal, aabbFromObbLocal);
-
-}
-
-bool IsSphereHitOBB(const Sphere& sphere, const OBB& obb) {
-
-	return IsSphereHitOBB(sphere, obb, GetObbWorldMatrix(obb));
 
 }
 
@@ -465,6 +506,23 @@ bool IsLineHitOBB(const Line& line, const OBB& obb) {
 
 }
 
+bool IsLineHitOBB(const Line& line, const OBB& obb, float& tNear, float& tFar) {
+
+	Vector3 localOrigin{};
+	Vector3 localDifference{};
+	AABB localAABB{};
+
+	TransformObbLocal(line.origin, line.difference, obb, localOrigin, localDifference, localAABB);
+
+	Line localLine{ localOrigin, localDifference };
+
+	tNear = 0.0f;
+	tFar = 0.0f;
+
+	return IsLineHitAABB(localLine, localAABB, tNear, tFar);
+
+}
+
 bool IsRayHitOBB(const Ray& ray, const OBB& obb) {
 
 	Vector3 localOrigin{};
@@ -479,6 +537,23 @@ bool IsRayHitOBB(const Ray& ray, const OBB& obb) {
 
 }
 
+bool IsRayHitOBB(const Ray& ray, const OBB& obb, float& tNear, float& tFar) {
+
+	Vector3 localOrigin{};
+	Vector3 localDifference{};
+	AABB localAABB{};
+
+	TransformObbLocal(ray.origin, ray.difference, obb, localOrigin, localDifference, localAABB);
+
+	Ray localRay{ localOrigin, localDifference };
+
+	tNear = 0.0f;
+	tFar = 0.0f;
+
+	return IsRayHitAABB(localRay, localAABB, tNear, tFar);
+
+}
+
 bool IsSegmentHitOBB(const Segment& segment, const OBB& obb) {
 
 	Vector3 localOrigin{};
@@ -490,6 +565,23 @@ bool IsSegmentHitOBB(const Segment& segment, const OBB& obb) {
 	Segment localSegment{ localOrigin, localDifference };
 
 	return IsSegmentHitAABB(localSegment, localAABB);
+
+}
+
+bool IsSegmentHitOBB(const Segment& segment, const OBB& obb, float& tNear, float& tFar) {
+
+	Vector3 localOrigin{};
+	Vector3 localDifference{};
+	AABB localAABB{};
+
+	TransformObbLocal(segment.origin, segment.difference, obb, localOrigin, localDifference, localAABB);
+
+	Segment localSegment{ localOrigin, localDifference };
+
+	tNear = 0.0f;
+	tFar = 0.0f;
+
+	return IsSegmentHitAABB(localSegment, localAABB, tNear, tFar);
 
 }
 
@@ -590,5 +682,27 @@ bool IsObbHitObb(const OBB& obb1, const OBB& obb2) {
 	}
 
 	return true;
+
+}
+
+bool IsCapsuleHitPlane(const Capsule& capsule, const Plane& plane) {
+
+	float t = 0.0f;
+
+	return IsCapsuleHitPlane(capsule, plane, t);
+
+}
+
+bool IsCapsuleHitPlane(const Capsule& capsule, const Plane& plane, float& t) {
+
+	if (!CalcT(capsule.segment.origin, capsule.segment.difference, plane, t)) {
+
+		return false;
+
+	}
+
+	t = std::clamp(t, 0.0f, 1.0f);
+
+	return IsSphereHitPlane(Sphere{ capsule.segment.origin + capsule.segment.difference * t, capsule.radius }, plane);
 
 }

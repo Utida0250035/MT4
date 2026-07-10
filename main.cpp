@@ -47,17 +47,15 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 	Vector3 cameraPosition{};
 	Vector3 cameraRotate{};
 
-	Ball weightBall{};
-	weightBall.radius = 0.1f;
-	weightBall.mass = 1.0f;
-	weightBall.position = { 1.0f, 1.0f, 0.0f };
-	weightBall.color = BLUE;
+	Ball ball{};
+	ball.radius = 0.1f;
+	ball.mass = 1.0f;
+	ball.bounciness = 0.8f;
+	ball.position = { 1.0f, 1.0f, 0.0f };
+	ball.color = BLUE;
 
-	Spring spring{};
-	spring.anchor = { 0.0f, 1.0f, 0.0f };
-	spring.naturalLength = 0.5f;
-	spring.stiffness = 100.0f;
-	spring.dampingCoefficient = 2.0f;
+	Plane plane{};
+	plane.normal = { 0.0f, 1.0f, 0.0f };
 
 	Vector3 gravity = { 0.0f, -20.0f, 0.0f };
 
@@ -98,35 +96,47 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 
 		camera->Update();
 
-		ImGui::Begin("spring");
+		ImGui::Begin("ball");
 
-		ImGui::SmallButton("start");
+		ImGui::SmallButton("isMove");
 
 		if (ImGui::IsItemActivated()) {
 
-			if (!isMove) {
-
-				isMove = true;
-
-			}
+			isMove = !isMove;
 
 		}
 
-		ImGui::Text("spring");
+		ImGui::SameLine();
 
-		ImGui::DragFloat3("anchorPos", &spring.anchor.x, 0.03125f);
-		ImGui::DragFloat("naturalLength", &spring.naturalLength, 0.03125f);
-		ImGui::DragFloat("stiffness", &spring.stiffness);
-		ImGui::DragFloat("dampingCoefficient", &spring.dampingCoefficient, 0.03125f);
+		ImGui::Text(isMove ? "on" : "off");
 
-		ImGui::Text("weight");
+		ImGui::SmallButton("reset");
 
-		ImGui::DragFloat3("weightPos", &weightBall.position.x);
-		ImGui::DragFloat("weightMass", &weightBall.mass);
+		if (ImGui::IsItemActivated()) {
 
-		if (weightBall.mass <= 0.5f) {
+			ball.acceleration = {};
+			ball.velocity = {};
+			ball.position = {};
 
-			weightBall.mass = 0.5f;
+		}
+
+		ImGui::DragFloat3("ballPos", &ball.position.x, 0.03125f);
+
+		ImGui::DragFloat3("ballVelocity", &ball.velocity.x, 0.03125f);
+
+		ImGui::DragFloat("ballBounciness", &ball.bounciness, 0.03125f);
+
+		ImGui::End();
+
+		ImGui::Begin("plane");
+
+		ImGui::DragFloat("distance", &plane.distance, 0.03125f);
+
+		ImGui::DragFloat3("normal", &plane.normal.x, 0.03125f);
+
+		if (ImGui::IsItemActive()) {
+
+			plane.normal = VectorNormalize(plane.normal);
 
 		}
 
@@ -134,7 +144,11 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 
 		if (isMove) {
 
-			SpringBallMovement(spring, weightBall, gravity, deltaTime);
+			ball.acceleration = gravity;
+			ball.velocity += ball.acceleration * deltaTime;
+			ball.position += ball.velocity * deltaTime;
+
+			BallReflectPlane(ball, plane, ball.bounciness, deltaTime);
 
 		}
 
@@ -148,7 +162,9 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 
 		DrawGrid(camera->GetViewProjectionMatrix(), camera->GetViewportMatrix());
 
-		DrawSpring(spring, weightBall, camera->GetViewProjectionMatrix(), camera->GetViewportMatrix(), weightBall.color);
+		DrawPlane(plane, camera->GetViewProjectionMatrix(), camera->GetViewportMatrix(), BLACK);
+
+		DrawSphere(Sphere{ ball.position, ball.radius }, camera->GetViewProjectionMatrix(), camera->GetViewportMatrix(), RED);
 
 		///
 		/// ↑描画処理ここまで
