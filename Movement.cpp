@@ -1,4 +1,6 @@
 ﻿#include "Movement.h"
+#include "Reflect.h"
+#include "Collision.h"
 #include <cmath>
 #include <numbers>
 
@@ -53,9 +55,9 @@ void ConicalPendulumBallMovement2D(ConicalPendulum& conicalPendulum, Ball& bob, 
 	conicalPendulum.angularVelocity = std::sqrt(-gravity / (conicalPendulum.length * std::cos(conicalPendulum.halfApexAngle)));
 	conicalPendulum.angle += conicalPendulum.angularVelocity * deltaTime;
 
-	if (conicalPendulum.angle <= 0.0f || conicalPendulum.angle >= std::numbers::pi_v<float> * 2.0f) {
+	if (conicalPendulum.angle <= 0.0f || conicalPendulum.angle >= std::numbers::pi_v<float> *2.0f) {
 
-		conicalPendulum.angle = std::fmod(conicalPendulum.angle, std::numbers::pi_v<float> * 2.0f);
+		conicalPendulum.angle = std::fmod(conicalPendulum.angle, std::numbers::pi_v<float> *2.0f);
 
 	}
 
@@ -73,4 +75,50 @@ void ConicalPendulumBallMovement2D(ConicalPendulum& conicalPendulum, Ball& bob, 
 	bob.acceleration = AccelerationFromOmega2D(conicalPendulum);
 	bob.velocity = VelocityFromOmega2D(conicalPendulum);
 
+}
+
+static bool GetHitTimeLinePlane(const Segment& segment, const Plane& plane, float& t) {
+	// 平面の法線と移動方向のドット積を計算
+	float denominator = VectorDot(segment.difference, plane.normal);
+
+	// 平面と線分が平行な場合（またはほぼ平行）
+	if (std::abs(denominator) < 1e-6f) {
+		return false;
+	}
+
+	// 衝突点の計算
+	// 平面の原点から線分の始点へのベクトル
+	Vector3 startToPlane = plane.distance * plane.normal - segment.origin;
+
+	// 平面までの符号付き距離を計算
+	t = VectorDot(startToPlane, plane.normal) / denominator;
+
+	// 線分の範囲内(0.0 <= t <= 1.0)かを確認
+	if (t >= 0.0f && t <= 1.0f) {
+		return true;
+	}
+
+	return false;
+}
+
+void BallReflectPlane(Ball& ball, const Plane& plane, const float e, const float deltaTime) {
+
+	const bool isHit = IsCapsuleHitPlane(Capsule{ Segment{ball.position - ball.velocity * deltaTime, ball.velocity * deltaTime}, ball.radius }, plane);
+
+	if (isHit) {
+		float t = 0.0f;
+
+		Segment segment{ ball.position - ball.velocity * deltaTime, ball.velocity };
+
+		if (GetHitTimeLinePlane(segment, plane, t)) {
+			ball.position = (ball.position - ball.velocity * deltaTime) + ball.velocity * t + (plane.normal * ball.radius);
+			ball.position += plane.normal * 0.01f;
+		}
+
+		float dot = VectorDot(ball.velocity, plane.normal);
+		Vector3 vNormal = plane.normal * dot;
+		Vector3 vTangent = ball.velocity - vNormal;
+
+		ball.velocity = vTangent - (vNormal * e);
+	}
 }

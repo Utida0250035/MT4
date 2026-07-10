@@ -59,6 +59,9 @@
     <ClCompile Include="DeltaTime.cpp">
       <Filter>KamataEngine</Filter>
     </ClCompile>
+    <ClCompile Include="Reflect.cpp">
+      <Filter>KamataEngine</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="C:\KamataEngine\DirectXGame\audio\Audio.h">
@@ -163,5 +166,9 @@
     <ClInclude Include="Movement.h" />
     <ClInclude Include="DeltaTime.h" />
     <ClInclude Include="Pendulum.h" />
+    <ClInclude Include="ConicalPendulum.h" />
+    <ClInclude Include="ConvertAngle.h" />
+    <ClInclude Include="Reflect.h" />
+    <ClInclude Include="Capsule.h" />
   </ItemGroup>
 </Project>

@@ -121,6 +121,7 @@ xcopy C:\KamataEngine\DirectXGame\Resources "$(OutDirFullPath)NoviceResources" /
     <ClCompile Include="NoviceUtility.cpp" />
     <ClCompile Include="OBB.cpp" />
     <ClCompile Include="Plane.cpp" />
+    <ClCompile Include="Reflect.cpp" />
     <ClCompile Include="Vector2.cpp" />
     <ClCompile Include="Vector3.cpp" />
   </ItemGroup>
@@ -156,6 +157,7 @@ xcopy C:\KamataEngine\DirectXGame\Resources "$(OutDirFullPath)NoviceResources" /
     <ClInclude Include="C:\KamataEngine\DirectXGame\scene\GameScene.h" />
     <ClInclude Include="C:\KamataEngine\Adapter\Novice.h" />
     <ClInclude Include="Camera.h" />
+    <ClInclude Include="Capsule.h" />
     <ClInclude Include="CatmullRom.h" />
     <ClInclude Include="Collision.h" />
     <ClInclude Include="ConicalPendulum.h" />
@@ -169,6 +171,7 @@ xcopy C:\KamataEngine\DirectXGame\Resources "$(OutDirFullPath)NoviceResources" /
     <ClInclude Include="OBB.h" />
     <ClInclude Include="Pendulum.h" />
     <ClInclude Include="Plane.h" />
+    <ClInclude Include="Reflect.h" />
     <ClInclude Include="Sphere.h" />
     <ClInclude Include="Spring.h" />
     <ClInclude Include="Transform.h" />
