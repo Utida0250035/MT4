@@ -1,6 +1,5 @@
 #include "Obj.hlsli"
 
-Texture2D<float4> tex : register(t0); // 0番スロットに設定されたテクスチャ
 SamplerState smp : register(s0);      // 0番スロットに設定されたサンプラー
 
 float4 main(VSOutput input) : SV_TARGET {
@@ -8,6 +7,7 @@ float4 main(VSOutput input) : SV_TARGET {
 	float2 uv = float2(
 	    input.uv.x * m_uv_scale.x + m_uv_offset.x, input.uv.y * m_uv_scale.y + m_uv_offset.y);
 	// テクスチャマッピング
+	Texture2D tex = ResourceDescriptorHeap[m_textureDescriptorIndex];
 	float4 texcolor = tex.Sample(smp, uv);
 
 	// 光沢度
@@ -20,16 +20,18 @@ float4 main(VSOutput input) : SV_TARGET {
 
 	// シェーディングによる色
     float4 shadecolor = float4(ambientColor * ambient, m_alpha);
+	
+    int i;
 
 	// 平行光源
-	for (int i = 0; i < DIRLIGHT_NUM; i++) {
+	for (i = 0; i < DIRLIGHT_NUM; i++) {
 		if (dirLights[i].active) {
 			// ライトに向かうベクトルと法線の内積
 			float NdotL = dot(dirLights[i].direction, input.normal);
 			// ハーフベクトル
 			float3 halfVector = normalize(dirLights[i].direction + viewDir);
 			// 拡散反射光 (Wrap Lighting)
-			float3 diffuse = pow((NdotL + m_wrap) / (1.0f + m_wrap), 2) * m_diffuse;
+            float3 diffuse = pow(saturate(NdotL + m_wrap) / (1.0f + m_wrap), 2) * m_diffuse;
 			// 鏡面反射光 (Blinn-Phong)
 			float3 specular = pow(saturate(dot(input.normal, halfVector)), shininess) * m_specular;
 
@@ -53,7 +55,7 @@ float4 main(VSOutput input) : SV_TARGET {
 			// 距離減衰
 			float factor = pow(saturate(1.0f - distance / pointLights[i].radius), pointLights[i].decay);
 			// 拡散反射光 (Wrap Lighting)
-			float3 diffuse = pow((NdotL + m_wrap) / (1.0f + m_wrap), 2) * m_diffuse;
+            float3 diffuse = pow(saturate(NdotL + m_wrap) / (1.0f + m_wrap), 2) * m_diffuse;
 			// 鏡面反射光 (Blinn-Phong)
 			float3 specular = pow(saturate(dot(input.normal, halfVector)), shininess) * m_specular;
 
@@ -85,7 +87,7 @@ float4 main(VSOutput input) : SV_TARGET {
 			// ハーフベクトル
 			float3 halfVector = normalize(direction + viewDir);
 			// 拡散反射光 (Wrap Lighting)
-			float3 diffuse = pow((NdotL + m_wrap) / (1.0f + m_wrap), 2) * m_diffuse;
+            float3 diffuse = pow(saturate(NdotL + m_wrap) / (1.0f + m_wrap), 2) * m_diffuse;
 			// 鏡面反射光 (Blinn-Phong)
 			float3 specular = pow(saturate(dot(input.normal, halfVector)), shininess) * m_specular;
 
