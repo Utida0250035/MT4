@@ -9,6 +9,7 @@
 #include "Matrix3D.h"
 #include "Movement.h"
 #include "NoviceUtility.h"
+#include "SphericalCoordinate.h"
 #include "OBB.h"
 #include "Sphere.h"
 #include "Spring.h"
@@ -65,6 +66,12 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 
 	bool isMove = false;
 
+	Spherical spherical{};
+
+	const float halfPi = std::numbers::pi_v<float> *0.5f;
+
+	spherical = { 6.0f, 0.0f, -halfPi };
+
 	// ウィンドウの×ボタンが押されるまでループ
 	while (Novice::ProcessMessage() == 0) {
 
@@ -81,6 +88,25 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 
 		timeManager->CalcDeltaTime();
 		deltaTime = timeManager->GetDeltaTime();
+
+		ImGui::Begin("SphericalCoordinate");
+
+		spherical.Imgui();
+
+		Vector3 cartesian = spherical.ToCartesian();
+
+		Matrix4x4 cameraMat = spherical.CameraMatrix();
+
+		ImGui::DragFloat3("toCartesian:", &cartesian.x);
+
+		ImGui::Text("cameraMatrix");
+
+		ImGui::DragFloat4("", cameraMat.m[0]);
+		ImGui::DragFloat4("", cameraMat.m[1]);
+		ImGui::DragFloat4("", cameraMat.m[2]);
+		ImGui::DragFloat4("", cameraMat.m[3]);
+
+		ImGui::End();
 
 		ImGui::Begin("camera");
 
