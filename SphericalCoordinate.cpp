@@ -36,7 +36,7 @@ Matrix4x4 Spherical::CameraMatrix(const Vector3& target) const {
 
 	Vector3 worldUp{ 0.0f, 1.0f ,0.0f };
 
-	Vector3 forward = VectorNormalize(VectorCross(target, eye));
+	Vector3 forward = VectorNormalize(target - eye);
 	Vector3 right = VectorNormalize(VectorCross(worldUp, forward));
 	Vector3 up = VectorNormalize(VectorCross(forward, right));
 
