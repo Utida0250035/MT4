@@ -14,6 +14,7 @@
 #include "Sphere.h"
 #include "Spring.h"
 #include "Transform.h"
+#include "Vector2.h"
 #include <algorithm>
 #include <cmath>
 #include <ImGui.h>
@@ -64,6 +65,8 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 
 	float deltaTime = 0.0f;
 
+	const float fixedDeltaTime = 1.0f / 60.0f;
+
 	bool isMove = false;
 
 	Spherical spherical{};
@@ -71,6 +74,14 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 	const float halfPi = std::numbers::pi_v<float> *0.5f;
 
 	spherical = { 6.0f, 0.0f, -halfPi };
+
+	float lerpSpeed = 8.0f;
+
+	const float kThirtySecond = 0.03125f;
+
+	Vector2 mousePos = {};
+
+	Vector2 circlePos = {640.0f, 360.0f};
 
 	// ウィンドウの×ボタンが押されるまでループ
 	while (Novice::ProcessMessage() == 0) {
@@ -88,6 +99,27 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 
 		timeManager->CalcDeltaTime();
 		deltaTime = timeManager->GetDeltaTime();
+
+		ImGui::Begin("LerpTest");
+
+		int mouseX = 0;
+		int mouseY = 0;
+
+		Novice::GetMousePosition(&mouseX, &mouseY);
+
+		mousePos = { static_cast<float>(mouseX), static_cast<float>(mouseY) };
+
+		ImGui::DragFloat("lerpSpeed", &lerpSpeed, kThirtySecond);
+
+		circlePos = Lerp(circlePos, mousePos, lerpSpeed * fixedDeltaTime);
+
+		ImGui::Text("MousePos: (%.1f, %.1f)", mousePos.x, mousePos.y);
+
+		ImGui::Text("CirclePos: (%.1f, %.1f)", circlePos.x, circlePos.y);
+
+		ImGui::Text("distance to target: %.1f", VectorLength(mousePos - circlePos));
+
+		ImGui::End();
 
 		ImGui::Begin("SphericalCoordinate");
 
@@ -191,6 +223,10 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 		DrawPlane(plane, camera->GetViewProjectionMatrix(), camera->GetViewportMatrix(), BLACK);
 
 		DrawSphere(Sphere{ ball.position, ball.radius }, camera->GetViewProjectionMatrix(), camera->GetViewportMatrix(), RED);
+
+		NoviceUtility::DrawCircle({ mousePos.x, mousePos.y, 0.0f }, 16.0f, RED);
+		NoviceUtility::DrawCircle({ circlePos.x, circlePos.y, 0.0f }, 32.0f, GREEN);
+		NoviceUtility::DrawLine({ circlePos.x, circlePos.y, 0.0f }, { mousePos.x, mousePos.y, 0.0f }, WHITE);
 
 		///
 		/// ↑描画処理ここまで
