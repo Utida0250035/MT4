@@ -1,5 +1,7 @@
 ﻿#pragma once
 
+#include "Lerp.h"
+
 struct Vector2 {
 	float x;
 	float y;
@@ -41,7 +43,7 @@ inline float VectorCross(const Vector2& me, const Vector2& other) {
 
 }
 
-inline Vector2 operator+(const Vector2& me ,const Vector2& other) {
+inline Vector2 operator+(const Vector2& me, const Vector2& other) {
 
 	return { me.x + other.x, me.y + other.y };
 
@@ -62,7 +64,7 @@ inline Vector2 operator-(const Vector2& me, const Vector2& other) {
 
 inline Vector2 operator-(const Vector2& me) {
 
-	return { -me.x, -me.y};
+	return { -me.x, -me.y };
 
 }
 
@@ -102,5 +104,11 @@ inline void operator/=(Vector2& me, const float& scalar) {
 
 	me.x /= scalar;
 	me.y /= scalar;
+
+}
+
+inline constexpr Vector2 Lerp(const Vector2& start, const Vector2& end, const float t) {
+
+	return { Lerp(start.x, end.x, t), Lerp(start.y, end.y, t) };
 
 }
