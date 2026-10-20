@@ -174,5 +174,6 @@
     <ClInclude Include="Reflect.h" />
     <ClInclude Include="Capsule.h" />
     <ClInclude Include="SphericalCoordinate.h" />
+    <ClInclude Include="Quaternion.h" />
   </ItemGroup>
 </Project>
