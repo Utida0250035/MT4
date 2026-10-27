@@ -223,7 +223,7 @@ struct Quaternion {
 		return rotateMatrix;
 	}
 
-	[[nodiscard]] Matrix4x4 MakeRotateMatrixLh() const {
+	[[nodiscard]] Matrix4x4 MakeRotateMatrix() const {
 
 		float x2 = x * x;
 		float y2 = y * y;
