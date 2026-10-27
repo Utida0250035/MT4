@@ -84,15 +84,12 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 
 	Vector2 circlePos = {640.0f, 360.0f};
 
-	Quaternion q1 = { 2.0f, 3.0f, 4.0f, 1.0f };
-	Quaternion q2 = { 1.0f, 3.0f, 5.0f, 2.0f };
-	Quaternion identityQ = Quaternion::Identity();
-	Quaternion conjQ = q1.Conjugated();
-	Quaternion invQ = q1.Inversed();
-	Quaternion normalQ = q1.Normalized();
-	Quaternion mulQ1 = Quaternion::Multiply(q1, q2);
-	Quaternion mulQ2 = Quaternion::Multiply(q2, q1);
-	float qNorm = q1.Norm();
+	Quaternion rotation = Quaternion::FromAxisAngle(
+		VectorNormalize(Vector3{ 1.0f, 0.4f, -0.2f }), 0.45f);
+	Vector3 pointY = { 2.1f, -0.9f, 1.3f };
+	Matrix4x4 rotateMatrix = rotation.MakeRotateMatrix();
+	Vector3 rotateByQuaternion = rotation.RotateVector(pointY);
+	Vector3 rotateByMatrix = VectorTransform(pointY, rotateMatrix);
 
 	// ウィンドウの×ボタンが押されるまでループ
 	while (Novice::ProcessMessage() == 0) {
@@ -112,14 +109,22 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 		deltaTime = timeManager->GetDeltaTime();
 
 		ImGui::Begin("QuaternionTest");
+		ImGui::Text("rotation");
+		ImGui::InputFloat4("", &rotation.x, "%.3f", ImGuiInputTextFlags_ReadOnly);
+		
+		ImGui::Text("rotateMatrix");
 
-		ImGui::InputFloat4("Identity", &identityQ.x, "%.3f", ImGuiInputTextFlags_ReadOnly);
-		ImGui::InputFloat4("Conjugate", &conjQ.x, "%.3f", ImGuiInputTextFlags_ReadOnly);
-		ImGui::InputFloat4("Inverse", &invQ.x, "%.3f", ImGuiInputTextFlags_ReadOnly);
-		ImGui::InputFloat4("Normalize", &normalQ.x, "%.3f", ImGuiInputTextFlags_ReadOnly);
-		ImGui::InputFloat4("q1 * q2", &mulQ1.x, "%.3f", ImGuiInputTextFlags_ReadOnly);
-		ImGui::InputFloat4("q2 * q1", &mulQ2.x, "%.3f", ImGuiInputTextFlags_ReadOnly);
-		ImGui::InputFloat("Norm", &qNorm, 0.0f, 0.0f, "%.3f", ImGuiInputTextFlags_ReadOnly);
+		for (auto* row : rotateMatrix.m) {
+
+			ImGui::InputFloat4("", row, "%.3f", ImGuiInputTextFlags_ReadOnly);
+
+		}
+
+		ImGui::Text("rotateByQuaternion");
+		ImGui::InputFloat3("", &rotateByQuaternion.x, "%.3f", ImGuiInputTextFlags_ReadOnly);
+
+		ImGui::Text("rotateByMatrix");
+		ImGui::InputFloat3("", &rotateByMatrix.x, "%.3f", ImGuiInputTextFlags_ReadOnly);
 
 		ImGui::End();
 
