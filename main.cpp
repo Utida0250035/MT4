@@ -85,24 +85,15 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 
 	Vector2 circlePos = {640.0f, 360.0f};
 
-	Vector3 from0 = VectorNormalize({1.0f, 0.0f, 0.0f});
-	Vector3 to0 = -from0;
-	Vector3 from1 = VectorNormalize({1.0f, 0.7f, 0.5f});
-	Vector3 to1 = -from1;
-	Vector3 from2 = VectorNormalize({-0.6f, 0.9f, 0.2f});
-	Vector3 to2 = VectorNormalize({0.4f, 0.7f, -0.5f});
-	Quaternion quaternion0 = Quaternion::FromTwoDirection(from0, to0);
-	Quaternion quaternion1 = Quaternion::FromTwoDirection(from1, to1);
-	Quaternion quaternion2 = Quaternion::FromTwoDirection(from2, to2);
-	Matrix4x4 rotateMatrix0 = quaternion0.MakeRotateMatrix();
-	Matrix4x4 rotateMatrix1 = quaternion1.MakeRotateMatrix();
-	Matrix4x4 rotateMatrix2 = quaternion2.MakeRotateMatrix();
-	Vector3 rotated0 = quaternion0.RotateVector(from0);
-	Vector3 rotated1 = quaternion1.RotateVector(from1);
-	Vector3 rotated2 = quaternion2.RotateVector(from2);
-	float norm0 = quaternion0.Norm();
-	float norm1 = quaternion1.Norm();
-	float norm2 = quaternion2.Norm();
+
+	Quaternion rotation0 = Quaternion::FromAxisAngle(VectorNormalize({0.71f, 0.71f, 0.0f}), 0.3f);
+	Quaternion rotation1 = Quaternion::FromAxisAngle(VectorNormalize({ 0.71f, 0.0f, 0.71f }), 3.141592f);
+
+	Quaternion interpolate0 = Quaternion::Slerp(rotation0, rotation1, 0.0f);
+	Quaternion interpolate1 = Quaternion::Slerp(rotation0, rotation1, 0.3f);
+	Quaternion interpolate2 = Quaternion::Slerp(rotation0, rotation1, 0.5f);
+	Quaternion interpolate3 = Quaternion::Slerp(rotation0, rotation1, 0.7f);
+	Quaternion interpolate4 = Quaternion::Slerp(rotation0, rotation1, 1.0f);
 
 	// ウィンドウの×ボタンが押されるまでループ
 	while (Novice::ProcessMessage() == 0) {
@@ -123,23 +114,11 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 
 		ImGui::Begin("QuaternionTest");
 		
-		MathImGui::DispMat4x4("rotateMatrix0", rotateMatrix0);
-		
-		MathImGui::DispMat4x4("rotateMatrix1", rotateMatrix1);
-
-		MathImGui::DispMat4x4("rotateMatrix2", rotateMatrix2);
-
-		MathImGui::DispVec3("to0", to0);
-		MathImGui::DispVec3("rotated0", rotated0);
-		MathImGui::DispFloat("norm0", norm0);
-
-		MathImGui::DispVec3("to1", to1);
-		MathImGui::DispVec3("rotated1", rotated1);
-		MathImGui::DispFloat("norm1", norm1);
-
-		MathImGui::DispVec3("to2", to2);
-		MathImGui::DispVec3("rotated2", rotated2);
-		MathImGui::DispFloat("norm2", norm2);
+		MathImGui::DispQuaternion("slerp(0.0f)", interpolate0);
+		MathImGui::DispQuaternion("slerp(0.3f)", interpolate1);
+		MathImGui::DispQuaternion("slerp(0.5f)", interpolate2);
+		MathImGui::DispQuaternion("slerp(0.7f)", interpolate3);
+		MathImGui::DispQuaternion("slerp(1.0f)", interpolate4);
 
 		ImGui::End();
 
