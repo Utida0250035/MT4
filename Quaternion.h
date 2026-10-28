@@ -193,34 +193,33 @@ struct Quaternion {
 		return q;
 	}
 
-	[[nodiscard]] Matrix4x4 MakeRotateMatrixRh() const {
+	[[nodiscard]] static Quaternion FromLhTwoDirection(Vector3 from, Vector3 to) {
 
-		float x2 = x * x;
-		float y2 = y * y;
-		float z2 = z * z;
-		float xy = x * y;
-		float xz = x * z;
-		float yz = y * z;
-		float wx = w * x;
-		float wy = w * y;
-		float wz = w * z;
+		from = VectorNormalize(from);
+		to = VectorNormalize(to);
 
-		Matrix4x4 rotateMatrix = MakeIdentity4x4();
+		constexpr Vector3 kRight = { 1.0f, 0.0f, 0.0f };
 
-		// 行優先(Row-Major)で回転成分のみを上書き
-		rotateMatrix.m[0][0] = 1.0f - 2.0f * (y2 + z2);
-		rotateMatrix.m[0][1] = 2.0f * (xy - wz);
-		rotateMatrix.m[0][2] = 2.0f * (xz + wy);
+		constexpr Vector3 kUp = { 0.0f, 1.0f, 0.0f };
 
-		rotateMatrix.m[1][0] = 2.0f * (xy + wz);
-		rotateMatrix.m[1][1] = 1.0f - 2.0f * (x2 + z2);
-		rotateMatrix.m[1][2] = 2.0f * (yz - wx);
+		float dot = VectorDot(from, to);
 
-		rotateMatrix.m[2][0] = 2.0f * (xz - wy);
-		rotateMatrix.m[2][1] = 2.0f * (yz + wx);
-		rotateMatrix.m[2][2] = 1.0f - 2.0f * (x2 + y2);
+		if (dot < -0.99999f) {
 
-		return rotateMatrix;
+			Vector3 axis = VectorCross(kRight, from);
+
+			if (VectorLengthSquare(axis) < 0.00001f) {
+
+				axis = VectorCross(kUp, from);
+			}
+
+			return Quaternion{ axis.x, axis.y, axis.z, 0.0f };
+		}
+
+		Vector3 axis = VectorCross(from, to);
+		Quaternion q = { axis.x, axis.y, axis.z, dot + 1.0f };
+
+		return q.Normalized();
 	}
 
 	[[nodiscard]] Matrix4x4 MakeRotateMatrix() const {
