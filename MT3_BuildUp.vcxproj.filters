@@ -65,6 +65,9 @@
     <ClCompile Include="SphericalCoordinate.cpp">
       <Filter>KamataEngine</Filter>
     </ClCompile>
+    <ClCompile Include="MathImGui.cpp">
+      <Filter>KamataEngine</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="C:\KamataEngine\DirectXGame\audio\Audio.h">
@@ -175,5 +178,6 @@
     <ClInclude Include="Capsule.h" />
     <ClInclude Include="SphericalCoordinate.h" />
     <ClInclude Include="Quaternion.h" />
+    <ClInclude Include="MathImGui.h" />
   </ItemGroup>
 </Project>
