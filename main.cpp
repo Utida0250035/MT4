@@ -12,10 +12,12 @@
 #include "NoviceUtility.h"
 #include "OBB.h"
 #include "Quaternion.h"
+#include "Slope.h"
 #include "Sphere.h"
 #include "SphericalCoordinate.h"
 #include "Spring.h"
 #include "Transform.h"
+#include "Unit.h"
 #include "Vector2.h"
 #include <algorithm>
 #include <cmath>
@@ -27,10 +29,28 @@
 
 // 個人: クラス記号_出席番号_氏_名_タイトル
 // チーム: チームNo_タイトル
-const char kWindowTitle[] = "LE2A_02_ウチダ_コウタ_MT3";
+const char kWindowTitle[] = "LE2A_03_ウチダ_コウタ_MT4";
 
 const float kWindowWidth = 1280.0f;
 const float kWindowHeight = 720.0f;
+
+static void DispVector2(const std::string& label, Vector2& vector) {
+
+	ImGui::InputFloat2(label.c_str(), &vector.x, "%.3f", ImGuiInputTextFlags_ReadOnly);
+
+}
+
+static void DispFloat(const std::string& label, float& val) {
+
+	ImGui::InputFloat(label.c_str(), &val,0.0f, 0.0f, "%.3f", ImGuiInputTextFlags_ReadOnly);
+
+}
+
+static Vector2 ToScreen(const Vector2& posWorld) {
+
+	return { posWorld.x + 256.0f, -posWorld.y + 592.0f };
+
+}
 
 // Windowsアプリでのエントリーポイント(main関数)
 int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
@@ -42,58 +62,16 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 	char keys[256] = { 0 };
 	char preKeys[256] = { 0 };
 
-	std::unique_ptr<DebugCamera> camera = std::make_unique<DebugCamera>();
-
-	camera->SetTranslate(Vector3{ 0.0f, 1.9f, -6.49f });
-
-	camera->SetRotate(Vector3{ 0.26f, 0.0f, 0.0f });
-
-	Vector3 cameraPosition{};
-	Vector3 cameraRotate{};
-
-	Ball ball{};
-	ball.radius = 0.1f;
-	ball.mass = 1.0f;
-	ball.bounciness = 0.8f;
-	ball.position = { 1.0f, 1.0f, 0.0f };
-	ball.color = BLUE;
-
-	Plane plane{};
-	plane.normal = { 0.0f, 1.0f, 0.0f };
-
-	Vector3 gravity = { 0.0f, -20.0f, 0.0f };
-
 	std::unique_ptr<DeltaTime> timeManager = std::make_unique<DeltaTime>();
-
 	float deltaTime = 0.0f;
 
-	const float fixedDeltaTime = 1.0f / 60.0f;
+	float bikeX = 0.0f;
 
-	bool isMove = false;
+	Vector2 position = { bikeX, ConstSlope::f(bikeX) };
+	float slope = ConstSlope::fPrime(bikeX);
+	Vector2 forward = VectorNormalize(Vector2{ 1.0f, slope });
 
-	Spherical spherical{};
-
-	const float halfPi = std::numbers::pi_v<float> *0.5f;
-
-	spherical = { 6.0f, 0.0f, -halfPi };
-
-	float lerpSpeed = 8.0f;
-
-	const float kThirtySecond = 0.03125f;
-
-	Vector2 mousePos = {};
-
-	Vector2 circlePos = {640.0f, 360.0f};
-
-
-	Quaternion rotation0 = Quaternion::FromAxisAngle(VectorNormalize({0.71f, 0.71f, 0.0f}), 0.3f);
-	Quaternion rotation1 = Quaternion::FromAxisAngle(VectorNormalize({ 0.71f, 0.0f, 0.71f }), 3.141592f);
-
-	Quaternion interpolate0 = Quaternion::Slerp(rotation0, rotation1, 0.0f);
-	Quaternion interpolate1 = Quaternion::Slerp(rotation0, rotation1, 0.3f);
-	Quaternion interpolate2 = Quaternion::Slerp(rotation0, rotation1, 0.5f);
-	Quaternion interpolate3 = Quaternion::Slerp(rotation0, rotation1, 0.7f);
-	Quaternion interpolate4 = Quaternion::Slerp(rotation0, rotation1, 1.0f);
+	Vector2 slopeEnd = { 2.0f, ConstSlope::f(2.0f) };
 
 	// ウィンドウの×ボタンが押されるまでループ
 	while (Novice::ProcessMessage() == 0) {
@@ -112,125 +90,29 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 		timeManager->CalcDeltaTime();
 		deltaTime = timeManager->GetDeltaTime();
 
-		ImGui::Begin("QuaternionTest");
-		
-		MathImGui::DispQuaternion("slerp(0.0f)", interpolate0);
-		MathImGui::DispQuaternion("slerp(0.3f)", interpolate1);
-		MathImGui::DispQuaternion("slerp(0.5f)", interpolate2);
-		MathImGui::DispQuaternion("slerp(0.7f)", interpolate3);
-		MathImGui::DispQuaternion("slerp(1.0f)", interpolate4);
-
-		ImGui::End();
-
-		ImGui::Begin("LerpTest");
-
-		int mouseX = 0;
-		int mouseY = 0;
-
-		Novice::GetMousePosition(&mouseX, &mouseY);
-
-		mousePos = { static_cast<float>(mouseX), static_cast<float>(mouseY) };
-
-		ImGui::DragFloat("lerpSpeed", &lerpSpeed, kThirtySecond);
-
-		circlePos = Lerp(circlePos, mousePos, lerpSpeed * fixedDeltaTime);
-
-		ImGui::Text("MousePos: (%.1f, %.1f)", mousePos.x, mousePos.y);
-
-		ImGui::Text("CirclePos: (%.1f, %.1f)", circlePos.x, circlePos.y);
-
-		ImGui::Text("distance to target: %.1f", VectorLength(mousePos - circlePos));
-
-		ImGui::End();
-
-		ImGui::Begin("SphericalCoordinate");
-
-		spherical.Imgui();
-
-		Vector3 cartesian = spherical.ToCartesian();
-
-		Matrix4x4 cameraMat = spherical.CameraMatrix();
-
-		ImGui::DragFloat3("toCartesian:", &cartesian.x);
-
-		ImGui::Text("cameraMatrix");
-
-		ImGui::DragFloat4("", cameraMat.m[0]);
-		ImGui::DragFloat4("", cameraMat.m[1]);
-		ImGui::DragFloat4("", cameraMat.m[2]);
-		ImGui::DragFloat4("", cameraMat.m[3]);
-
-		ImGui::End();
-
-		ImGui::Begin("camera");
-
-		cameraPosition = camera->GetTranslate();
-		ImGui::DragFloat3("cameraTranslate", &cameraPosition.x, 0.0625f);
-		camera->SetTranslate(cameraPosition);
-
-		cameraRotate = camera->GetRotate();
-		ImGui::DragFloat3("cameraRotate", &cameraRotate.x, 0.0625f);
-		camera->SetRotate(cameraRotate);
-
-		ImGui::End();
-
-		camera->Update();
-
-		ImGui::Begin("ball");
-
-		ImGui::SmallButton("isMove");
-
-		if (ImGui::IsItemActivated()) {
-
-			isMove = !isMove;
-
+		if (keys[DIK_A]) {
+			bikeX -= kThirtySecond;
 		}
 
-		ImGui::SameLine();
-
-		ImGui::Text(isMove ? "on" : "off");
-
-		ImGui::SmallButton("reset");
-
-		if (ImGui::IsItemActivated()) {
-
-			ball.acceleration = {};
-			ball.velocity = {};
-			ball.position = {};
-
+		if (keys[DIK_D]) {
+			bikeX += kThirtySecond;
 		}
 
-		ImGui::DragFloat3("ballPos", &ball.position.x, 0.03125f);
+		bikeX = std::clamp(bikeX, 0.0f, 2.0f);
 
-		ImGui::DragFloat3("ballVelocity", &ball.velocity.x, 0.03125f);
+		position = { bikeX, ConstSlope::f(bikeX) };
+		slope = ConstSlope::fPrime(bikeX);
+		forward = VectorNormalize(Vector2{ 1.0f, slope });
 
-		ImGui::DragFloat("ballBounciness", &ball.bounciness, 0.03125f);
+		ImGui::Begin("slope");
+
+		DispVector2("position", position);
+
+		DispVector2("forward", forward);
+
+		DispFloat("slope(incline)", slope);
 
 		ImGui::End();
-
-		ImGui::Begin("plane");
-
-		ImGui::DragFloat("distance", &plane.distance, 0.03125f);
-
-		ImGui::DragFloat3("normal", &plane.normal.x, 0.03125f);
-
-		if (ImGui::IsItemActive()) {
-
-			plane.normal = VectorNormalize(plane.normal);
-
-		}
-
-		ImGui::End();
-
-		if (isMove) {
-
-			ball.acceleration = gravity;
-			ball.velocity += ball.acceleration * deltaTime;
-			ball.position += ball.velocity * deltaTime;
-
-			BallReflectPlane(ball, plane, ball.bounciness, deltaTime);
-
-		}
 
 		///
 		/// ↑更新処理ここまで
@@ -240,19 +122,42 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 		/// ↓描画処理ここから
 		///
 
-		DrawGrid(camera->GetViewProjectionMatrix(), camera->GetViewportMatrix());
 
-		DrawPlane(plane, camera->GetViewProjectionMatrix(), camera->GetViewportMatrix(), BLACK);
-
-		DrawSphere(Sphere{ ball.position, ball.radius }, camera->GetViewProjectionMatrix(), camera->GetViewportMatrix(), RED);
-
-		NoviceUtility::DrawCircle({ mousePos.x, mousePos.y, 0.0f }, 16.0f, RED);
-		NoviceUtility::DrawCircle({ circlePos.x, circlePos.y, 0.0f }, 32.0f, GREEN);
-		NoviceUtility::DrawLine({ circlePos.x, circlePos.y, 0.0f }, { mousePos.x, mousePos.y, 0.0f }, WHITE);
 
 		///
 		/// ↑描画処理ここまで
 		///
+
+		Vector2 bikeFrontEndScreen = ToScreen(position * kPixelPerMetor + forward * 0.125f * kPixelPerMetor);
+
+		Vector2 bikeBackEndScreen = ToScreen(position * kPixelPerMetor - forward * 0.125f * kPixelPerMetor);
+
+		NoviceUtility::DrawLine(bikeBackEndScreen, bikeFrontEndScreen, RED);
+
+		NoviceUtility::DrawCircle(bikeBackEndScreen, kPixelPerMetor * kThirtySecond, RED);
+
+		NoviceUtility::DrawCircle(bikeFrontEndScreen, kPixelPerMetor * kThirtySecond, RED);
+
+		Vector2 slopeEndScreen = ToScreen(slopeEnd);
+		Vector2 slopeEndScreenBelow = ToScreen({ slopeEnd.x, 0.0f });
+		Vector2 groundEndScreen[2] = { ToScreen({ 0.0f, 0.0f }), ToScreen({ 5.4f , 0.0f }) };
+
+		NoviceUtility::DrawLine(slopeEndScreen, slopeEndScreenBelow, WHITE);
+
+		NoviceUtility::DrawLine(groundEndScreen[0], groundEndScreen[1], WHITE);
+
+		for (size_t i = 0; i < 16; ++i) {
+
+			const float xPerTick = 2.0f / 16.0f;
+
+			const float x0 = xPerTick * static_cast<float>(i);
+			const float x1 = xPerTick * static_cast<float>(i + 1);
+
+			Vector2 posInSlope[2] = { ToScreen(Vector2{ x0, ConstSlope::f(x0) } * kPixelPerMetor), ToScreen(Vector2{x1, ConstSlope::f(x1)}* kPixelPerMetor)};
+
+			NoviceUtility::DrawLine(posInSlope[0], posInSlope[1], WHITE);
+
+		}
 
 		// フレームの終了
 		Novice::EndFrame();
