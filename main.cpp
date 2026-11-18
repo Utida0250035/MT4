@@ -29,7 +29,7 @@
 
 // 個人: クラス記号_出席番号_氏_名_タイトル
 // チーム: チームNo_タイトル
-const char kWindowTitle[] = "LE2A_02_ウチダ_コウタ_MT3";
+const char kWindowTitle[] = "LE2A_03_ウチダ_コウタ_MT4";
 
 const float kWindowWidth = 1280.0f;
 const float kWindowHeight = 720.0f;
