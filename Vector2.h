@@ -15,7 +15,7 @@ inline float VectorLengthSquare(const Vector2& me) {
 
 }
 
-inline Vector2 VectorNorm(const Vector2& me) {
+inline Vector2 VectorNormalize(const Vector2& me) {
 
 	float length = VectorLength(me);
 
