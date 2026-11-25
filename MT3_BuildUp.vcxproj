@@ -109,6 +109,7 @@ xcopy C:\KamataEngine\DirectXGame\Resources "$(OutDirFullPath)NoviceResources" /
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="AABB.cpp" />
+    <ClCompile Include="Bezier.cpp" />
     <ClCompile Include="C:\KamataEngine\Adapter\Novice.cpp" />
     <ClCompile Include="Camera.cpp" />
     <ClCompile Include="Collision.cpp" />
@@ -119,6 +120,7 @@ xcopy C:\KamataEngine\DirectXGame\Resources "$(OutDirFullPath)NoviceResources" /
     <ClCompile Include="MathImGui.cpp" />
     <ClCompile Include="Matrix3D.cpp" />
     <ClCompile Include="Movement.cpp" />
+    <ClCompile Include="MyImGui.cpp" />
     <ClCompile Include="NoviceUtility.cpp" />
     <ClCompile Include="OBB.cpp" />
     <ClCompile Include="Plane.cpp" />
@@ -162,6 +164,7 @@ xcopy C:\KamataEngine\DirectXGame\Resources "$(OutDirFullPath)NoviceResources" /
     <ClInclude Include="Camera.h" />
     <ClInclude Include="Capsule.h" />
     <ClInclude Include="CatmullRom.h" />
+    <ClInclude Include="Clamp.h" />
     <ClInclude Include="Collision.h" />
     <ClInclude Include="ConicalPendulum.h" />
     <ClInclude Include="ConvertAngle.h" />
@@ -171,6 +174,7 @@ xcopy C:\KamataEngine\DirectXGame\Resources "$(OutDirFullPath)NoviceResources" /
     <ClInclude Include="MathImGui.h" />
     <ClInclude Include="Matrix3D.h" />
     <ClInclude Include="Movement.h" />
+    <ClInclude Include="MyImGui.h" />
     <ClInclude Include="NoviceUtility.h" />
     <ClInclude Include="OBB.h" />
     <ClInclude Include="Pendulum.h" />
@@ -181,6 +185,7 @@ xcopy C:\KamataEngine\DirectXGame\Resources "$(OutDirFullPath)NoviceResources" /
     <ClInclude Include="Sphere.h" />
     <ClInclude Include="SphericalCoordinate.h" />
     <ClInclude Include="Spring.h" />
+    <ClInclude Include="ToScreen.h" />
     <ClInclude Include="Transform.h" />
     <ClInclude Include="Triangle.h" />
     <ClInclude Include="Unit.h" />

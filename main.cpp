@@ -2,6 +2,7 @@
 #include "Ball.h"
 #include "Bezier.h"
 #include "Camera.h"
+#include "Clamp.h"
 #include "Collision.h"
 #include "DeltaTime.h"
 #include "DrawShapes.h"
@@ -9,6 +10,7 @@
 #include "MathImGui.h"
 #include "Matrix3D.h"
 #include "Movement.h"
+#include "MyImGui.h"
 #include "NoviceUtility.h"
 #include "OBB.h"
 #include "Quaternion.h"
@@ -34,24 +36,6 @@ const char kWindowTitle[] = "LE2A_03_ウチダ_コウタ_MT4";
 const float kWindowWidth = 1280.0f;
 const float kWindowHeight = 720.0f;
 
-static void DispVector2(const std::string& label, Vector2& vector) {
-
-	ImGui::InputFloat2(label.c_str(), &vector.x, "%.3f", ImGuiInputTextFlags_ReadOnly);
-
-}
-
-static void DispFloat(const std::string& label, float& val) {
-
-	ImGui::InputFloat(label.c_str(), &val,0.0f, 0.0f, "%.3f", ImGuiInputTextFlags_ReadOnly);
-
-}
-
-static Vector2 ToScreen(const Vector2& posWorld) {
-
-	return { posWorld.x + 256.0f, -posWorld.y + 592.0f };
-
-}
-
 // Windowsアプリでのエントリーポイント(main関数)
 int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 
@@ -65,13 +49,18 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 	std::unique_ptr<DeltaTime> timeManager = std::make_unique<DeltaTime>();
 	float deltaTime = 0.0f;
 
-	float bikeX = 0.0f;
+	float carT = 0.0f;
 
-	Vector2 position = { bikeX, ConstSlope::f(bikeX) };
-	float slope = ConstSlope::fPrime(bikeX);
-	Vector2 forward = VectorNormalize(Vector2{ 1.0f, slope });
+	Bezier2Vec2 bezier{};
 
-	Vector2 slopeEnd = { 2.0f, ConstSlope::f(2.0f) };
+	bezier.p[0] = {200.0f, 570.0f};
+	bezier.p[1] = { 800.0f, 70.0f };
+	bezier.p[2] = { 1080.0f, 570.0f };
+
+	Vector2 carPos{};
+	Vector2 carForward{};
+
+	Vector2 adjustedForward{};
 
 	// ウィンドウの×ボタンが押されるまでループ
 	while (Novice::ProcessMessage() == 0) {
@@ -90,29 +79,29 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 		timeManager->CalcDeltaTime();
 		deltaTime = timeManager->GetDeltaTime();
 
-		if (keys[DIK_A]) {
-			bikeX -= kThirtySecond;
-		}
 
-		if (keys[DIK_D]) {
-			bikeX += kThirtySecond;
-		}
 
-		bikeX = std::clamp(bikeX, 0.0f, 2.0f);
+		ImGui::Begin("bezier");
 
-		position = { bikeX, ConstSlope::f(bikeX) };
-		slope = ConstSlope::fPrime(bikeX);
-		forward = VectorNormalize(Vector2{ 1.0f, slope });
+		ImGui::Text("<drag>");
 
-		ImGui::Begin("slope");
+		ImGui::SliderFloat("t", &carT, 0.0f, 1.0f);
+		
+		ImGui::SliderFloat("p1 x", &bezier.p[1].x, 400.0f, 800.0f);
+		ImGui::SliderFloat("p1 y", &bezier.p[1].y, 20.0f, 570.0f);
 
-		ImGui::Text("A, D: Move");
+		carPos = Bezier(bezier, carT);
+		carForward = VectorNormalize(BezierDeriative(bezier, carT));
 
-		DispVector2("position", position);
+		ImGui::Text("<display>");
 
-		DispVector2("forward", forward);
+		DispVector2("position", carPos);
 
-		DispFloat("slope(incline)", slope);
+		DispVector2("forward", carForward);
+
+		adjustedForward = carForward * 120.0f;
+
+		DispVector2("forward * 120.0f", adjustedForward);
 
 		ImGui::End();
 
@@ -130,36 +119,22 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 		/// ↑描画処理ここまで
 		///
 
-		Vector2 bikeFrontEndScreen = ToScreen(position * kPixelPerMetor + forward * 0.125f * kPixelPerMetor);
-
-		Vector2 bikeBackEndScreen = ToScreen(position * kPixelPerMetor - forward * 0.125f * kPixelPerMetor);
-
-		NoviceUtility::DrawLine(bikeBackEndScreen, bikeFrontEndScreen, RED);
-
-		NoviceUtility::DrawCircle(bikeBackEndScreen, kPixelPerMetor * kThirtySecond, RED);
-
-		NoviceUtility::DrawCircle(bikeFrontEndScreen, kPixelPerMetor * kThirtySecond, RED);
-
-		Vector2 slopeEndScreen = ToScreen(slopeEnd);
-		Vector2 slopeEndScreenBelow = ToScreen({ slopeEnd.x, 0.0f });
-		Vector2 groundEndScreen[2] = { ToScreen({ 0.0f, 0.0f }), ToScreen({ 5.4f , 0.0f }) };
-
-		NoviceUtility::DrawLine(slopeEndScreen, slopeEndScreenBelow, WHITE);
-
-		NoviceUtility::DrawLine(groundEndScreen[0], groundEndScreen[1], WHITE);
+		NoviceUtility::DrawLine(carPos, carPos + adjustedForward, RED);
 
 		for (size_t i = 0; i < 16; ++i) {
 
-			const float xPerTick = 2.0f / 16.0f;
+			const float xPerTick = 1.0f / 16.0f;
 
 			const float x0 = xPerTick * static_cast<float>(i);
 			const float x1 = xPerTick * static_cast<float>(i + 1);
 
-			Vector2 posInSlope[2] = { ToScreen(Vector2{ x0, ConstSlope::f(x0) } * kPixelPerMetor), ToScreen(Vector2{x1, ConstSlope::f(x1)}* kPixelPerMetor)};
+			Vector2 posInBezier[2] = { Bezier(bezier, x0), Bezier(bezier, x1) };
 
-			NoviceUtility::DrawLine(posInSlope[0], posInSlope[1], WHITE);
+			NoviceUtility::DrawLine(posInBezier[0], posInBezier[1], WHITE);
 
 		}
+
+		NoviceUtility::DrawCircle(carPos, kPixelPerMetor * kThirtySecond, GREEN);
 
 		// フレームの終了
 		Novice::EndFrame();

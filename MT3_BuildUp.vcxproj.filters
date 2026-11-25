@@ -71,6 +71,12 @@
     <ClCompile Include="Slope.cpp">
       <Filter>KamataEngine</Filter>
     </ClCompile>
+    <ClCompile Include="Bezier.cpp">
+      <Filter>KamataEngine</Filter>
+    </ClCompile>
+    <ClCompile Include="MyImGui.cpp">
+      <Filter>KamataEngine</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="C:\KamataEngine\DirectXGame\audio\Audio.h">
@@ -184,5 +190,10 @@
     <ClInclude Include="MathImGui.h" />
     <ClInclude Include="Unit.h" />
     <ClInclude Include="Slope.h" />
+    <ClInclude Include="Clamp.h" />
+    <ClInclude Include="MyImGui.h" />
+    <ClInclude Include="ToScreen.h">
+      <Filter>KamataEngine</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>
